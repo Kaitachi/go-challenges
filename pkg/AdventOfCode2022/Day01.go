@@ -1,0 +1,2 @@
+package AOC2022
+
