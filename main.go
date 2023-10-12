@@ -2,37 +2,27 @@ package main
 
 import (
 	"embed"
-	"fmt"
 
 	"github.com/kaitachi/go-challenges/internal/lib"
+	AOC2022 "github.com/kaitachi/go-challenges/pkg/AdventOfCode2022"
 )
 
 //go:embed assets/*
 var assets embed.FS
 
 func main() {
+	var soln lib.Solution
+	soln = AOC2022.AOC2022_Day01{}
+
 	thing := lib.Challenge{
 		Assets:		&assets,
-		AssetPath:	"assets/AdventOfCode2022",
+		Challenge:	"AdventOfCode2022",
 		Solution:	"Day01",
+		DataSet:	"example",
+		Algorithm:	"part01",
+		Soln:		soln,
 	}
 
-	files, err := thing.GetFiles()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("FILES FOR THIS SOLUTION:")
-	for _, file := range files {
-		fmt.Println(file)
-	}
-	fmt.Println("^^^")
-
-	test, err := assets.ReadFile(files[0])
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(string(test))
+	thing.Execute()
 }
 

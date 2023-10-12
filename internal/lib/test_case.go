@@ -2,10 +2,10 @@ package lib
 
 type TestCase struct {
 	Name	string
-	Input	*string
-	Output	*string
+	Input	string
+	Output	string
 
-	Actual	*string
+	Actual	string
 }
 
 
@@ -15,6 +15,6 @@ func (tc *TestCase) IsSolution() bool {
 
 
 func (tc *TestCase) IsUnknownTestCase() bool {
-	return tc.Output == nil
+	return tc.Output == ""
 }
 
