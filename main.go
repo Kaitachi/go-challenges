@@ -11,10 +11,9 @@ import (
 var assets embed.FS
 
 func main() {
-	var soln lib.Solution
-	soln = AOC2022.AOC2022_Day01{}
+	soln := AOC2022.AOC2022_Day01{}
 
-	thing := lib.Challenge{
+	thing := lib.Challenge[[][]int]{
 		Assets:		&assets,
 		Challenge:	"AdventOfCode2022",
 		Solution:	"Day01",
@@ -24,5 +23,6 @@ func main() {
 	}
 
 	thing.Execute()
+
 }
 

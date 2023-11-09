@@ -1,10 +1,10 @@
 package lib
 
-type Solution interface {
-	Run()	bool
+type Solution[T any] interface {
+	Run(string, string)	bool
 
-	Assemble(TestCase)	
-	Activate()
+	Assemble(*TestCase[T], string, string)
+	Activate(*TestCase[T])
 	Assert()	bool
 }
 

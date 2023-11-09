@@ -1,20 +1,20 @@
 package lib
 
-type TestCase struct {
+type TestCase[T any] struct {
 	Name	string
-	Input	string
+	Input	T
 	Output	string
 
 	Actual	string
 }
 
 
-func (tc *TestCase) IsSolution() bool {
+func (tc *TestCase[any]) IsSolution() bool {
 	return tc.Output == tc.Actual
 }
 
 
-func (tc *TestCase) IsUnknownTestCase() bool {
+func (tc *TestCase[any]) IsUnknownTestCase() bool {
 	return tc.Output == ""
 }
 

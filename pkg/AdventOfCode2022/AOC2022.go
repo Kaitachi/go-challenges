@@ -5,7 +5,7 @@ import (
 )
 
 type AOC2022 interface {
-	part01(*lib.TestCase)
-	part02(*lib.TestCase)
+	part01(*lib.TestCase[any])
+	part02(*lib.TestCase[any])
 }
 
