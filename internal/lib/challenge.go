@@ -8,21 +8,32 @@ import (
 	"strings"
 )
 
-type Challenge[T any] struct {
+type Challenge struct {
 	Assets		*embed.FS
 	Challenge	string
 	Solution	string
 	DataSet		string
 	Algorithm	string
+}
 
-	Soln		Solution[T]
+
+func GetChallenge(fs *embed.FS, name string, solution string, ds string, algo string) Challenge {
+	challenge := Challenge{
+			Assets: fs,
+			Challenge: name,
+			Solution: solution,
+			DataSet: ds,
+			Algorithm: algo,
+		}
+
+	return challenge
 }
 
 
 // Kudos to @mrsoftware for the function below!
 // Code adapted for use case
 // https://gist.github.com/clarkmcc/1fdab4472283bb68464d066d6b4169bc?permalink_comment_id=4405804#gistcomment-4405804
-func (c Challenge[any]) GetFiles() (files []string, err error) {
+func (c Challenge) GetFiles() (files []string, err error) {
 	if err := fs.WalkDir(c.Assets, ".", func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			return nil
@@ -47,70 +58,58 @@ func (c Challenge[any]) GetFiles() (files []string, err error) {
 }
 
 
-// Run current configuration
-func (c Challenge[any]) Execute() {
-	c.solve()
-}
-
-
-func (c Challenge[any]) getAssetPath() string {
+func (c Challenge) getAssetPath() string {
 	return fmt.Sprintf("assets/%s", c.Challenge)
 }
 
 
-func (c Challenge[any]) getDatasetInputPath() string {
+func (c Challenge) getDatasetInputPath() string {
 	return fmt.Sprintf("%s/%s.%s.in", c.getAssetPath(), c.Solution, c.DataSet)
 }
 
 
-func (c Challenge[any]) getAlgorithmOutputPath() string {
+func (c Challenge) getAlgorithmOutputPath() string {
 	return fmt.Sprintf("%s/%s.%s.%s.out", c.getAssetPath(), c.Solution, c.DataSet, c.Algorithm)
 }
 
 
-func (c Challenge[any]) getSolutionInputPath() string {
+func (c Challenge) getSolutionInputPath() string {
 	return fmt.Sprintf("%s/%s.in", c.getAssetPath(), c.Solution)
 }
 
 
-func (c Challenge[any]) GetDatasetInputData() (string, error) {
+func (c Challenge) GetDatasetInputData() (string, error) {
 	data, err := c.Assets.ReadFile(c.getDatasetInputPath())
 
 	return string(data), err
 }
 
 
-func (c Challenge[any]) GetAlgorithmOutputData() (string, error) {
+func (c Challenge) GetAlgorithmOutputData() (string, error) {
 	data, err := c.Assets.ReadFile(c.getAlgorithmOutputPath())
 
 	return string(data), err
 }
 
 
-func (c Challenge[any]) GetSolutionInputData() (string, error) {
+func (c Challenge) GetSolutionInputData() (string, error) {
 	data, err := c.Assets.ReadFile(c.getSolutionInputPath())
 
 	return string(data), err
 }
 
 
-
-func (c Challenge[any]) solve() {
-
-	inputData, err := c.GetDatasetInputData()
+func (c Challenge) GetScenarioData() (string, string) {
+	input, err := c.GetDatasetInputData()
 	if err != nil {
-		panic("> Something went wrong while reading dataset input!")
+		panic(err)
 	}
 
-	outputData, err := c.GetAlgorithmOutputData()
+	output, err := c.GetAlgorithmOutputData()
 	if err != nil {
-		panic("> Something went wrong while reading dataset output!")
+		panic(err)
 	}
 
-	if c.Soln.Run(inputData, outputData) {
-		fmt.Println("Found solution!")
-	}
-
-	fmt.Println("Finished execution.")
+	return input, output
 }
 

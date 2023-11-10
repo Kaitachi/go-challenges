@@ -1,6 +1,7 @@
 package AOC2022
 
 import (
+	"embed"
 	"fmt"
 	"strconv"
 	"strings"
@@ -9,23 +10,23 @@ import (
 )
 
 type AOC2022_Day01 struct {
+	Challenge lib.Challenge
 	TestCase lib.TestCase[[][]int]
-
-	// TODO: Could I somehow declare [][]int type at this level to be used everywhere?
 }
 
 
-// TODO: How can I abstract this method?
-func (s AOC2022_Day01) Run(input string, output string) bool {
-	testCase := lib.TestCase[[][]int]{}
-	s.Assemble(&testCase, input, output)
-	s.Activate(&testCase)
-	return s.Assert()
+func SetUp_AOC2022_Day01(fs *embed.FS, ds string, algo string) AOC2022_Day01 {
+	return AOC2022_Day01{
+		Challenge: GetAOC2022Challenge(fs, "Day01", ds, algo),
+		TestCase: lib.TestCase[[][]int]{},
+	}
 }
 
 
-func (s AOC2022_Day01) Assemble(tc *lib.TestCase[[][]int], input string, output string) {
+func (s *AOC2022_Day01) Assemble() {
 	fmt.Println("AOC2022_Day01.assemble")
+
+	input, output := s.Challenge.GetScenarioData()
 
 	elvesStrings := strings.Split(input, "\n\n")
 	elves := [][]int{}
@@ -49,18 +50,23 @@ func (s AOC2022_Day01) Assemble(tc *lib.TestCase[[][]int], input string, output 
 		elves = append(elves, collection)
 	}
 
-	tc.Input = elves
-	tc.Output = output
+	s.TestCase.Input = elves
+	s.TestCase.Output = strings.TrimSpace(output)
+
+	fmt.Println("> output: " + s.TestCase.Output)
 }
 
 
-func (s AOC2022_Day01) Activate(tc *lib.TestCase[[][]int]) {
+func (s *AOC2022_Day01) Activate() {
 	fmt.Println("AOC2022_Day01.activate")
+	fmt.Println("> output: " + s.TestCase.Output)
 }
 
 
-func (s AOC2022_Day01) Assert() bool {
+func (s *AOC2022_Day01) Assert() bool {
 	fmt.Println("AOC2022_Day01.assert")
+	fmt.Println("> output: " + s.TestCase.Output)
+
 	return true
 }
 

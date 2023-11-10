@@ -11,18 +11,9 @@ import (
 var assets embed.FS
 
 func main() {
-	soln := AOC2022.AOC2022_Day01{}
+	problem := AOC2022.SetUp_AOC2022_Day01(&assets, "example", "part01")
 
-	thing := lib.Challenge[[][]int]{
-		Assets:		&assets,
-		Challenge:	"AdventOfCode2022",
-		Solution:	"Day01",
-		DataSet:	"example",
-		Algorithm:	"part01",
-		Soln:		soln,
-	}
 
-	thing.Execute()
-
+	lib.Solve(&problem)
 }
 
