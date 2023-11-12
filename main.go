@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"fmt"
 
 	"github.com/kaitachi/go-challenges/internal/lib"
 	AOC2022 "github.com/kaitachi/go-challenges/pkg/AdventOfCode2022"
@@ -11,9 +12,12 @@ import (
 var assets embed.FS
 
 func main() {
-	problem := AOC2022.SetUp_AOC2022_Day01(&assets, "example", "part01")
+	scenarios := []string{"example"}
 
+	problem := AOC2022.SetUp_AOC2022_Day01(&assets, scenarios, "part01")
 
-	lib.Solve(&problem)
+	solution := lib.Solve(&problem)
+
+	fmt.Printf("> Solution for this problem: %s\n", solution)
 }
 

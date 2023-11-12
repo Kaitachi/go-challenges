@@ -12,12 +12,12 @@ type Challenge struct {
 	Assets		*embed.FS
 	Challenge	string
 	Solution	string
-	DataSet		string
+	DataSet		[]string
 	Algorithm	string
 }
 
 
-func GetChallenge(fs *embed.FS, name string, solution string, ds string, algo string) Challenge {
+func GetChallenge(fs *embed.FS, name string, solution string, ds []string, algo string) Challenge {
 	challenge := Challenge{
 			Assets: fs,
 			Challenge: name,
@@ -63,13 +63,13 @@ func (c Challenge) getAssetPath() string {
 }
 
 
-func (c Challenge) getDatasetInputPath() string {
-	return fmt.Sprintf("%s/%s.%s.in", c.getAssetPath(), c.Solution, c.DataSet)
+func (c Challenge) getDatasetInputPath(scenario string) string {
+	return fmt.Sprintf("%s/%s.%s.in", c.getAssetPath(), c.Solution, scenario)
 }
 
 
-func (c Challenge) getAlgorithmOutputPath() string {
-	return fmt.Sprintf("%s/%s.%s.%s.out", c.getAssetPath(), c.Solution, c.DataSet, c.Algorithm)
+func (c Challenge) getAlgorithmOutputPath(scenario string) string {
+	return fmt.Sprintf("%s/%s.%s.%s.out", c.getAssetPath(), c.Solution, scenario, c.Algorithm)
 }
 
 
@@ -78,38 +78,59 @@ func (c Challenge) getSolutionInputPath() string {
 }
 
 
-func (c Challenge) GetDatasetInputData() (string, error) {
-	data, err := c.Assets.ReadFile(c.getDatasetInputPath())
+func (c Challenge) getDatasetInputData(scenario string) (string, error) {
+	data, err := c.Assets.ReadFile(c.getDatasetInputPath(scenario))
 
 	return string(data), err
 }
 
 
-func (c Challenge) GetAlgorithmOutputData() (string, error) {
-	data, err := c.Assets.ReadFile(c.getAlgorithmOutputPath())
+func (c Challenge) getAlgorithmOutputData(scenario string) (string, error) {
+	data, err := c.Assets.ReadFile(c.getAlgorithmOutputPath(scenario))
 
 	return string(data), err
 }
 
 
-func (c Challenge) GetSolutionInputData() (string, error) {
+func (c Challenge) getSolutionInputData() (string, error) {
 	data, err := c.Assets.ReadFile(c.getSolutionInputPath())
 
 	return string(data), err
 }
 
 
-func (c Challenge) GetScenarioData() (string, string) {
-	input, err := c.GetDatasetInputData()
+func (c Challenge) getScenarioData(scenario string) (string, string) {
+	input, err := c.getDatasetInputData(scenario)
 	if err != nil {
 		panic(err)
 	}
 
-	output, err := c.GetAlgorithmOutputData()
+	output, err := c.getAlgorithmOutputData(scenario)
 	if err != nil {
 		panic(err)
 	}
 
 	return input, output
+}
+
+
+func (c Challenge) getSolutionData() (string, string) {
+	input, err := c.getSolutionInputData()
+	if err != nil {
+		panic(err)
+	}
+
+	return input, ""
+}
+
+
+func (c Challenge) Data(scenario string) (string, string) {
+	switch scenario {
+	case "": // Get real data
+		return c.getSolutionData()
+	
+	default:
+		return c.getScenarioData(scenario)
+	}
 }
 

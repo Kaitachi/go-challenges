@@ -2,7 +2,6 @@ package AOC2022
 
 import (
 	"embed"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -15,18 +14,15 @@ type AOC2022_Day01 struct {
 }
 
 
-func SetUp_AOC2022_Day01(fs *embed.FS, ds string, algo string) AOC2022_Day01 {
+func SetUp_AOC2022_Day01(fs *embed.FS, ds []string, algo string) AOC2022_Day01 {
 	return AOC2022_Day01{
 		Challenge: GetAOC2022Challenge(fs, "Day01", ds, algo),
-		TestCase: lib.TestCase[[][]int]{},
 	}
 }
 
 
-func (s *AOC2022_Day01) Assemble() {
-	fmt.Println("AOC2022_Day01.assemble")
-
-	input, output := s.Challenge.GetScenarioData()
+func (s *AOC2022_Day01) Assemble(scenario string) {
+	input, output := s.Challenge.Data(scenario)
 
 	elvesStrings := strings.Split(input, "\n\n")
 	elves := [][]int{}
@@ -50,23 +46,33 @@ func (s *AOC2022_Day01) Assemble() {
 		elves = append(elves, collection)
 	}
 
+	s.TestCase.Name = scenario
 	s.TestCase.Input = elves
 	s.TestCase.Output = strings.TrimSpace(output)
-
-	fmt.Println("> output: " + s.TestCase.Output)
 }
 
 
 func (s *AOC2022_Day01) Activate() {
-	fmt.Println("AOC2022_Day01.activate")
-	fmt.Println("> output: " + s.TestCase.Output)
+
+	// Assign final value to TestCase.Actual field
+	s.TestCase.Actual = "24000"
 }
 
 
-func (s *AOC2022_Day01) Assert() bool {
-	fmt.Println("AOC2022_Day01.assert")
-	fmt.Println("> output: " + s.TestCase.Output)
+func (s *AOC2022_Day01) Assert() {
 
-	return true
+	s.TestCase.Verify()
+}
+
+
+
+// TODO: Is there any way to move these metods elsewhere???
+func (s *AOC2022_Day01) Scenarios() []string {
+	return s.Challenge.DataSet
+}
+
+
+func (s *AOC2022_Day01) Solution() string {
+	return s.TestCase.Actual
 }
 

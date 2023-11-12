@@ -1,5 +1,7 @@
 package lib
 
+import "fmt"
+
 type TestCase[T any] struct {
 	Name	string
 	Input	T
@@ -9,12 +11,9 @@ type TestCase[T any] struct {
 }
 
 
-func (tc *TestCase[any]) IsSolution() bool {
-	return tc.Output == tc.Actual
-}
-
-
-func (tc *TestCase[any]) IsUnknownTestCase() bool {
-	return tc.Output == ""
+func (tc *TestCase[any]) Verify() {
+	if tc.Output != tc.Actual {
+		panic(fmt.Sprintf("> Sample scenario %s failed! Expected: %s; actual: %s.", tc.Name, tc.Output, tc.Actual))
+	}
 }
 

@@ -12,7 +12,7 @@ type AOC2022 interface {
 }
 
 
-func GetAOC2022Challenge(fs *embed.FS, solution string, ds string, algo string) lib.Challenge {
+func GetAOC2022Challenge(fs *embed.FS, solution string, ds []string, algo string) lib.Challenge {
 	challenge := lib.GetChallenge(fs, "AdventOfCode2022", solution, ds, algo)
 
 	return challenge
