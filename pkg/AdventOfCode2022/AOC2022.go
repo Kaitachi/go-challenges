@@ -3,8 +3,8 @@ package AOC2022
 import "github.com/kaitachi/go-challenges/internal/lib"
 
 type AOC2022 interface {
-	part01(*lib.TestCase[any])
-	part02(*lib.TestCase[any])
+	part01() string
+	part02() string
 }
 
 
