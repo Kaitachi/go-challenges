@@ -7,25 +7,13 @@ import (
 	"github.com/kaitachi/go-challenges/internal/lib"
 )
 
-type Day01 struct {
-	lib.Problem
-}
-
-
-func SetUp_AOC2022_Day01(ds []string, algo string) Day01 {
-	return Day01{
-		Problem: lib.Problem{
-			Challenge: GetAOC2022Challenge("Day01", ds, algo),
-		},
-	}
-}
+type Day01 struct {}
 
 
 // 1. Assemble - How should we transform the data from our input files?
-func (s *Day01) Assemble(scenario string) {
-	input, output := s.Challenge.Data(scenario)
+func (s Day01) Assemble(tc *lib.TestCase[any]) {
 
-	elvesStrings := strings.Split(input, "\n\n")
+	elvesStrings := strings.Split(tc.Input, "\n\n")
 	elves := [][]int{}
 
 	for _, elf := range elvesStrings {
@@ -47,18 +35,17 @@ func (s *Day01) Assemble(scenario string) {
 		elves = append(elves, collection)
 	}
 
-	s.TestCase.Name = scenario
-	s.TestCase.Input = elves
-	s.TestCase.Output = strings.TrimSpace(output)
+	tc.Data = elves
+	tc.Output = strings.TrimSpace(tc.Output)
 }
 
 
-// TODO: There is a *slight* chance that this method could be moved elsewhere--how???
 // 2. Activate - Take our transformed input data and make the core logic needed to resolve this Problem
-func (s *Day01) Activate() {
+func (s Day01) Activate(tc *lib.TestCase[any]) {
+
 	var result string
 
-	switch s.Challenge.Algorithm {
+	switch tc.Algorithm {
 	case "part01":
 		result = s.part01()
 		
@@ -67,16 +54,16 @@ func (s *Day01) Activate() {
 	}
 
 	// Assign final value to TestCase.Actual field
-	s.TestCase.Actual = result
+	tc.Actual = result
 }
 
 
-func (s *Day01) part01() string {
+func (s Day01) part01() string {
 	return "24000"
 }
 
 
-func (s *Day01) part02() string {
+func (s Day01) part02() string {
 	return "-1"
 }
 

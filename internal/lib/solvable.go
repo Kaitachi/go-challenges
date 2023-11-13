@@ -1,40 +1,61 @@
 package lib
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+	"strings"
+)
 
 
-type Solvable interface {
-	Assemble(string)
-	Activate()
-	Assert()
-
-	Scenarios() []string
-	Solution() string
+type Solvable[T any] interface {
+	Assemble(*TestCase[T])
+	Activate(*TestCase[T])
 }
 
 
-func Solve(s Solvable) string {
+func Solve(s Solvable[any], scenarios []string, algorithm string) string {
+
+	// Calculate challenge & problem name
+	challengeName := ChallengeOf(s)
+	problemName := NameOf(s)
+
+	c := NewChallenge(challengeName, problemName, scenarios, algorithm)
 	
 	// Iterate through all provided scenarios...
-	for _, scenario := range s.Scenarios() {
+	for _, scenario := range scenarios {
 		fmt.Printf("> Running scenario %s...\n", scenario)
 
+		tc := NewTestCase[any](c, scenario, algorithm)
+
 		// Each scenario provided must execute successfully
-		s.Assemble(scenario)
-		s.Activate()
-		s.Assert()
+		s.Assemble(tc)
+		s.Activate(tc)
+		Assert(tc)
 
 		fmt.Printf("> Scenario %s passed!\n", scenario)
 	}
 
+	tc := NewTestCase[any](c, "", algorithm)
+
 	// Once all sample scenarios have been executed successfully,
 	//	we may attempt to run the final "real data" scenario
-	s.Assemble("")
-	s.Activate()
-	// s.Assert() // We cannot assert this scenario; we don't know the actual value just yet
+	s.Assemble(tc)
+	s.Activate(tc)
+	// Assert() // We cannot assert this scenario; we don't know the actual value just yet
 
 	// If everything is correct with the algorithm,
 	//	this should be your final solution
-	return s.Solution()
+	return tc.Actual
+}
+
+
+func ChallengeOf(s Solvable[any]) string {
+	challengePath := strings.Split(reflect.TypeOf(s).PkgPath(), "/")
+	return challengePath[len(challengePath)-1]
+}
+
+
+func NameOf(s Solvable[any]) string {
+	return reflect.TypeOf(s).Name()
 }
 

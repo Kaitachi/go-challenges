@@ -20,7 +20,7 @@ type Challenge struct {
 }
 
 
-func GetChallenge(name string, solution string, ds []string, algo string) Challenge {
+func NewChallenge(name string, solution string, ds []string, algo string) Challenge {
 
 	challenge := Challenge{
 			Assets: &assets.Assets,

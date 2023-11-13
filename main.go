@@ -8,15 +8,12 @@ import (
 )
 
 func main() {
-	challengeName := "AOC2022"
-	problemName := "Day01"
+	problem := AOC2022.Day01{}
 	algorithmName := "part01"
 	scenarios := []string{"example"}
 
-	problem := AOC2022.SetUp_AOC2022_Day01(scenarios, algorithmName)
+	solution := lib.Solve(problem, scenarios, algorithmName)
 
-	solution := lib.Solve(&problem)
-
-	fmt.Printf("> Solution for %s, problem %s (%s): %s\n", challengeName, problemName, algorithmName, solution)
+	fmt.Printf("> Solution for %s, problem %s (%s): %s\n", lib.ChallengeOf(problem), lib.NameOf(problem), algorithmName, solution)
 }
 
