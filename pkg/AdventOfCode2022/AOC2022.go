@@ -1,10 +1,6 @@
 package AOC2022
 
-import (
-	"embed"
-
-	"github.com/kaitachi/go-challenges/internal/lib"
-)
+import "github.com/kaitachi/go-challenges/internal/lib"
 
 type AOC2022 interface {
 	part01(*lib.TestCase[any])
@@ -12,8 +8,8 @@ type AOC2022 interface {
 }
 
 
-func GetAOC2022Challenge(fs *embed.FS, solution string, ds []string, algo string) lib.Challenge {
-	challenge := lib.GetChallenge(fs, "AdventOfCode2022", solution, ds, algo)
+func GetAOC2022Challenge(solution string, ds []string, algo string) lib.Challenge {
+	challenge := lib.GetChallenge("AdventOfCode2022", solution, ds, algo)
 
 	return challenge
 }

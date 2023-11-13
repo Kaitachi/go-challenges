@@ -6,7 +6,10 @@ import (
 	"io/fs"
 	"path/filepath"
 	"strings"
+
+	"github.com/kaitachi/go-challenges/assets"
 )
+
 
 type Challenge struct {
 	Assets		*embed.FS
@@ -17,9 +20,10 @@ type Challenge struct {
 }
 
 
-func GetChallenge(fs *embed.FS, name string, solution string, ds []string, algo string) Challenge {
+func GetChallenge(name string, solution string, ds []string, algo string) Challenge {
+
 	challenge := Challenge{
-			Assets: fs,
+			Assets: &assets.Assets,
 			Challenge: name,
 			Solution: solution,
 			DataSet: ds,
@@ -59,7 +63,7 @@ func (c Challenge) GetFiles() (files []string, err error) {
 
 
 func (c Challenge) getAssetPath() string {
-	return fmt.Sprintf("assets/%s", c.Challenge)
+	return fmt.Sprintf("%s", c.Challenge)
 }
 
 
