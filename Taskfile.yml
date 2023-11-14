@@ -1,0 +1,14 @@
+version: '3'
+
+
+tasks:
+  #  default:
+  #  desc: Show all tasks
+  #  cmds:
+  #    - task --list-all
+
+  default:
+    desc: Run predetermined problem
+    cmds:
+      - go run . AdventOfCode2022 Day01 part01 example
+
