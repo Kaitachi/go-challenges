@@ -11,6 +11,11 @@ import (
 )
 
 
+type Challenger interface {
+	GetProblem(string) (Solvable[any], bool)
+}
+
+
 type Challenge struct {
 	Assets		*embed.FS
 	Challenge	string

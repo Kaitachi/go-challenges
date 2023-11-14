@@ -14,18 +14,7 @@ type TestCase[T any] struct {
 
 
 // Create Test Case with scenario data
-func NewTestCase[T any](c Challenge, scenario string, algorithm string) *TestCase[T] {
-
-	var input, output string
-
-	switch scenario {
-	case "":
-		input, output = c.getSolutionData()
-		break
-
-	default:
-		input, output = c.getScenarioData(scenario)
-	}
+func NewTestCase[T any](input string, output string, scenario string, algorithm string) *TestCase[T] {
 
 	return &TestCase[T]{
 		Name: scenario,

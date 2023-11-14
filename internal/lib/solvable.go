@@ -24,8 +24,9 @@ func Solve(s Solvable[any], scenarios []string, algorithm string) string {
 	// Iterate through all provided scenarios...
 	for _, scenario := range scenarios {
 		fmt.Printf("> Running scenario %s...\n", scenario)
+		input, output := c.Data(scenario)
 
-		tc := NewTestCase[any](c, scenario, algorithm)
+		tc := NewTestCase[any](input, output, scenario, algorithm)
 
 		// Each scenario provided must execute successfully
 		s.Assemble(tc)
@@ -35,7 +36,9 @@ func Solve(s Solvable[any], scenarios []string, algorithm string) string {
 		fmt.Printf("> Scenario %s passed!\n", scenario)
 	}
 
-	tc := NewTestCase[any](c, "", algorithm)
+	input, output := c.Data("")
+
+	tc := NewTestCase[any](input, output, "", algorithm)
 
 	// Once all sample scenarios have been executed successfully,
 	//	we may attempt to run the final "real data" scenario
