@@ -7,13 +7,13 @@ import (
 )
 
 
-type Solvable[T any] interface {
-	Assemble(*TestCase[T])
-	Activate(*TestCase[T])
+type Solvable interface {
+	Assemble(*TestCase)
+	Activate(*TestCase)
 }
 
 
-func Solve(s Solvable[any], scenarios []string, algorithm string) string {
+func Solve(s Solvable, scenarios []string, algorithm string) string {
 
 	// Calculate challenge & problem name
 	challengeName := ChallengeOf(s)
@@ -26,7 +26,7 @@ func Solve(s Solvable[any], scenarios []string, algorithm string) string {
 		fmt.Printf("> Running scenario %s...\n", scenario)
 		input, output := c.Data(scenario)
 
-		tc := NewTestCase[any](input, output, scenario, algorithm)
+		tc := NewTestCase(input, output, scenario, algorithm)
 
 		// Each scenario provided must execute successfully
 		s.Assemble(tc)
@@ -38,7 +38,7 @@ func Solve(s Solvable[any], scenarios []string, algorithm string) string {
 
 	input, output := c.Data("")
 
-	tc := NewTestCase[any](input, output, "", algorithm)
+	tc := NewTestCase(input, output, "", algorithm)
 
 	// Once all sample scenarios have been executed successfully,
 	//	we may attempt to run the final "real data" scenario
@@ -52,13 +52,13 @@ func Solve(s Solvable[any], scenarios []string, algorithm string) string {
 }
 
 
-func ChallengeOf(s Solvable[any]) string {
+func ChallengeOf(s Solvable) string {
 	challengePath := strings.Split(reflect.TypeOf(s).PkgPath(), "/")
 	return challengePath[len(challengePath)-1]
 }
 
 
-func NameOf(s Solvable[any]) string {
+func NameOf(s Solvable) string {
 	return reflect.TypeOf(s).Name()
 }
 

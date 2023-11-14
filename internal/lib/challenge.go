@@ -12,7 +12,7 @@ import (
 
 
 type Challenger interface {
-	GetProblem(string) (Solvable[any], bool)
+	GetProblem(string) (Solvable, bool)
 }
 
 

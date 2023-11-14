@@ -37,6 +37,9 @@ func main() {
 		panic(fmt.Sprintf("Invalid Problem name given for %s: %s", challengeName, problemName))
 	}
 
+	fmt.Println(lib.ChallengeOf(problem))
+	fmt.Println(lib.NameOf(problem))
+
 	solution := lib.Solve(problem, scenarios, algorithmName)
 
 	fmt.Printf("> Solution for %s, problem %s (%s): %s\n", lib.ChallengeOf(problem), lib.NameOf(problem), algorithmName, solution)

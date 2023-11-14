@@ -2,21 +2,20 @@ package lib
 
 import "fmt"
 
-type TestCase[T any] struct {
+type TestCase struct {
 	Name		string
 	Algorithm	string
 	Input		string
 	Output		string
 
-	Data		T
 	Actual		string
 }
 
 
 // Create Test Case with scenario data
-func NewTestCase[T any](input string, output string, scenario string, algorithm string) *TestCase[T] {
+func NewTestCase(input string, output string, scenario string, algorithm string) *TestCase {
 
-	return &TestCase[T]{
+	return &TestCase{
 		Name: scenario,
 		Algorithm: algorithm,
 		Input: input,
@@ -26,7 +25,7 @@ func NewTestCase[T any](input string, output string, scenario string, algorithm 
 
 
 // 3. Assert - Every Scenario should be verified
-func Assert(tc *TestCase[any]) {
+func Assert(tc *TestCase) {
 	if tc.Output != tc.Actual {
 		panic(fmt.Sprintf("> Sample scenario %s failed! Expected: %s; actual: %s.", tc.Name, tc.Output, tc.Actual))
 	}

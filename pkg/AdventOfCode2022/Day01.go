@@ -7,11 +7,13 @@ import (
 	"github.com/kaitachi/go-challenges/internal/lib"
 )
 
-type Day01 struct {}
+type Day01 struct {
+	data [][]int
+}
 
 
 // 1. Assemble - How should we transform the data from our input files?
-func (s Day01) Assemble(tc *lib.TestCase[any]) {
+func (s Day01) Assemble(tc *lib.TestCase) {
 
 	elvesStrings := strings.Split(tc.Input, "\n\n")
 	elves := [][]int{}
@@ -35,13 +37,13 @@ func (s Day01) Assemble(tc *lib.TestCase[any]) {
 		elves = append(elves, collection)
 	}
 
-	tc.Data = elves
+	s.data = elves
 	tc.Output = strings.TrimSpace(tc.Output)
 }
 
 
 // 2. Activate - Take our transformed input data and make the core logic needed to resolve this Problem
-func (s Day01) Activate(tc *lib.TestCase[any]) {
+func (s Day01) Activate(tc *lib.TestCase) {
 
 	var result string
 
