@@ -13,7 +13,7 @@ type Day01 struct {
 
 
 // 1. Assemble - How should we transform the data from our input files?
-func (s Day01) Assemble(tc *lib.TestCase) {
+func (s *Day01) Assemble(tc *lib.TestCase) {
 
 	elvesStrings := strings.Split(tc.Input, "\n\n")
 	elves := [][]int{}
@@ -43,7 +43,7 @@ func (s Day01) Assemble(tc *lib.TestCase) {
 
 
 // 2. Activate - Take our transformed input data and make the core logic needed to resolve this Problem
-func (s Day01) Activate(tc *lib.TestCase) {
+func (s *Day01) Activate(tc *lib.TestCase) {
 
 	var result string
 

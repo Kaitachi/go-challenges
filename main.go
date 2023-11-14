@@ -20,7 +20,6 @@ func main() {
 	if len(args) < 4 {
 		panic("Usage: CHALLENGE PROBLEM ALGORITHM SCENARIO [...SCENARIO]")
 	}
-	fmt.Println(args)
 
 	challengeName := args[0]
 	problemName := args[1]
@@ -37,11 +36,8 @@ func main() {
 		panic(fmt.Sprintf("Invalid Problem name given for %s: %s", challengeName, problemName))
 	}
 
-	fmt.Println(lib.ChallengeOf(problem))
-	fmt.Println(lib.NameOf(problem))
+	solution := lib.Solve(challenge, *problem, scenarios, algorithmName)
 
-	solution := lib.Solve(problem, scenarios, algorithmName)
-
-	fmt.Printf("> Solution for %s, problem %s (%s): %s\n", lib.ChallengeOf(problem), lib.NameOf(problem), algorithmName, solution)
+	fmt.Printf("> Solution for %s, problem %s (%s): %s\n", lib.NameOf(challenge), lib.NameOf(*problem), algorithmName, solution)
 }
 

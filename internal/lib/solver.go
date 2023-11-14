@@ -3,28 +3,27 @@ package lib
 import (
 	"fmt"
 	"reflect"
-	"strings"
 )
 
 
-type Solvable interface {
+type Solver interface {
 	Assemble(*TestCase)
 	Activate(*TestCase)
 }
 
 
-func Solve(s Solvable, scenarios []string, algorithm string) string {
+func Solve(c Challenger, s Solver, scenarios []string, algorithm string) string {
 
 	// Calculate challenge & problem name
-	challengeName := ChallengeOf(s)
+	challengeName := NameOf(c)
 	problemName := NameOf(s)
 
-	c := NewChallenge(challengeName, problemName, scenarios, algorithm)
+	challenge := NewChallenge(challengeName, problemName, scenarios, algorithm)
 	
 	// Iterate through all provided scenarios...
 	for _, scenario := range scenarios {
 		fmt.Printf("> Running scenario %s...\n", scenario)
-		input, output := c.Data(scenario)
+		input, output := challenge.Data(scenario)
 
 		tc := NewTestCase(input, output, scenario, algorithm)
 
@@ -36,7 +35,7 @@ func Solve(s Solvable, scenarios []string, algorithm string) string {
 		fmt.Printf("> Scenario %s passed!\n", scenario)
 	}
 
-	input, output := c.Data("")
+	input, output := challenge.Data("")
 
 	tc := NewTestCase(input, output, "", algorithm)
 
@@ -52,13 +51,7 @@ func Solve(s Solvable, scenarios []string, algorithm string) string {
 }
 
 
-func ChallengeOf(s Solvable) string {
-	challengePath := strings.Split(reflect.TypeOf(s).PkgPath(), "/")
-	return challengePath[len(challengePath)-1]
-}
-
-
-func NameOf(s Solvable) string {
-	return reflect.TypeOf(s).Name()
+func NameOf(i interface{}) string {
+	return reflect.TypeOf(i).Elem().Name()
 }
 
