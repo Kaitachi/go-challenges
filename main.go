@@ -31,9 +31,9 @@ func main() {
 		panic(fmt.Sprintf("Challenge %s not found!", challengeName))
 	}
 
-	problem, ok := challenge.GetProblem(problemName)
+	problem, ok := challenge.GetSolution(problemName)
 	if !ok {
-		panic(fmt.Sprintf("Invalid Problem name given for %s: %s", challengeName, problemName))
+		panic(fmt.Sprintf("Invalid Solution name given for %s: %s", challengeName, problemName))
 	}
 
 	solution := lib.Solve(challenge, *problem, scenarios, algorithmName)

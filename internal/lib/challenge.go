@@ -12,7 +12,7 @@ import (
 
 
 type Challenger interface {
-	GetProblem(string) (*Solver, bool)
+	GetSolution(string) (*Solver, bool)
 }
 
 
@@ -43,15 +43,11 @@ func NewChallenge(name string, solution string, ds []string, algo string) Challe
 // Code adapted for use case
 // https://gist.github.com/clarkmcc/1fdab4472283bb68464d066d6b4169bc?permalink_comment_id=4405804#gistcomment-4405804
 func (c Challenge) GetFiles() (files []string, err error) {
-	if err := fs.WalkDir(c.Assets, ".", func(path string, d fs.DirEntry, err error) error {
+	if err := fs.WalkDir(c.Assets, c.Challenge, func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			return nil
 		}
  
-		if !strings.HasPrefix(path, c.getAssetPath()) {
-			return nil
-		}
-
 		if !strings.HasPrefix(filepath.Base(path), c.Solution) {
 			return nil
 		}
@@ -67,69 +63,52 @@ func (c Challenge) GetFiles() (files []string, err error) {
 }
 
 
-func (c Challenge) getAssetPath() string {
-	return fmt.Sprintf("%s", c.Challenge)
-}
-
-
 func (c Challenge) getDatasetInputPath(scenario string) string {
-	return fmt.Sprintf("%s/%s.%s.in", c.getAssetPath(), c.Solution, scenario)
+	return fmt.Sprintf("%s/%s.%s.in", c.Challenge, c.Solution, scenario)
 }
 
 
 func (c Challenge) getAlgorithmOutputPath(scenario string) string {
-	return fmt.Sprintf("%s/%s.%s.%s.out", c.getAssetPath(), c.Solution, scenario, c.Algorithm)
+	return fmt.Sprintf("%s/%s.%s.%s.out", c.Challenge, c.Solution, scenario, c.Algorithm)
 }
 
 
 func (c Challenge) getSolutionInputPath() string {
-	return fmt.Sprintf("%s/%s.in", c.getAssetPath(), c.Solution)
-}
-
-
-func (c Challenge) getDatasetInputData(scenario string) (string, error) {
-	data, err := c.Assets.ReadFile(c.getDatasetInputPath(scenario))
-
-	return string(data), err
-}
-
-
-func (c Challenge) getAlgorithmOutputData(scenario string) (string, error) {
-	data, err := c.Assets.ReadFile(c.getAlgorithmOutputPath(scenario))
-
-	return string(data), err
-}
-
-
-func (c Challenge) getSolutionInputData() (string, error) {
-	data, err := c.Assets.ReadFile(c.getSolutionInputPath())
-
-	return string(data), err
+	return fmt.Sprintf("%s/%s.in", c.Challenge, c.Solution)
 }
 
 
 func (c Challenge) getScenarioData(scenario string) (string, string) {
-	input, err := c.getDatasetInputData(scenario)
+	// Read sample input file
+	inputPath := c.getDatasetInputPath(scenario)
+
+	input, err := c.Assets.ReadFile(inputPath)
 	if err != nil {
 		panic(err)
 	}
 
-	output, err := c.getAlgorithmOutputData(scenario)
+	// Read expected output file
+	outputPath := c.getAlgorithmOutputPath(scenario)
+
+	output, err := c.Assets.ReadFile(outputPath)
 	if err != nil {
 		panic(err)
 	}
 
-	return input, output
+	return string(input), string(output)
 }
 
 
 func (c Challenge) getSolutionData() (string, string) {
-	input, err := c.getSolutionInputData()
+	// Read input file
+	solutionInput := c.getSolutionInputPath()
+
+	input, err := c.Assets.ReadFile(solutionInput)
 	if err != nil {
 		panic(err)
 	}
 
-	return input, ""
+	return string(input), ""
 }
 
 
