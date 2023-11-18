@@ -1,6 +1,8 @@
 package AOC2022
 
 import (
+	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -61,11 +63,42 @@ func (s *Day01) Activate(tc *lib.TestCase) {
 
 
 func (s Day01) part01() string {
-	return "24000"
+	
+	elves := getElfWeights(s.data)
+	sort.Sort(sort.Reverse(sort.IntSlice(elves)))
+
+	return fmt.Sprintf("%d", elves[0])
 }
 
 
 func (s Day01) part02() string {
-	return "-1"
+
+	// Select Top N elves with the most Calories
+	topN := 3
+
+	elves := getElfWeights(s.data)
+	sort.Sort(sort.Reverse(sort.IntSlice(elves)))
+
+	sum := 0
+	for i := 0; i < topN; i++ {
+		sum += elves[i]
+	}
+
+	return fmt.Sprintf("%d", sum)
+}
+
+
+func getElfWeights(elves [][]int) []int {
+	weights := make([]int, len(elves))
+
+	// Add up all items per elf
+	for i, elf := range elves {
+
+		for _, item := range elf {
+			weights[i] += item
+		}
+	}
+
+	return weights
 }
 
