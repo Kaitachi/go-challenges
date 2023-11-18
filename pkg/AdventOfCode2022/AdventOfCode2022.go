@@ -1,6 +1,6 @@
 package AOC2022
 
-import"github.com/kaitachi/go-challenges/internal/lib"
+import "github.com/kaitachi/go-challenges/internal/lib"
 
 
 type AdventOfCode2022 struct {}
