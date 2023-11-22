@@ -17,6 +17,13 @@ var challenges = map[string]lib.Challenger{
 func main() {
 	args := os.Args[1:]
 
+	if len(args) == 3 && args[0] == "create" {
+		challenge := lib.NewChallenge(args[1], args[2], []string{""}, "")
+		lib.NewSolution(challenge, args[2])
+
+		os.Exit(0)
+	}
+
 	if len(args) < 4 {
 		panic("Usage: CHALLENGE PROBLEM ALGORITHM SCENARIO [...SCENARIO]")
 	}

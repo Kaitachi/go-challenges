@@ -4,8 +4,9 @@ import (
 	"embed"
 	"fmt"
 	"io/fs"
-	"path/filepath"
+	"os"
 	"strings"
+	"text/template"
 
 	"github.com/kaitachi/go-challenges/assets"
 )
@@ -39,27 +40,46 @@ func NewChallenge(name string, solution string, ds []string, algo string) Challe
 }
 
 
-// Kudos to @mrsoftware for the function below!
-// Code adapted for use case
-// https://gist.github.com/clarkmcc/1fdab4472283bb68464d066d6b4169bc?permalink_comment_id=4405804#gistcomment-4405804
-func (c Challenge) GetFiles() (files []string, err error) {
-	if err := fs.WalkDir(c.Assets, c.Challenge, func(path string, d fs.DirEntry, err error) error {
-		if d.IsDir() {
-			return nil
-		}
- 
-		if !strings.HasPrefix(filepath.Base(path), c.Solution) {
-			return nil
-		}
+func NewSolution(c Challenge, name string) {
 
-		files = append(files, path)
-
-		return nil
-	}); err != nil {
-		return nil, err
+	tokens := map[string]string{
+		"SolutionName": name,
 	}
 
-	return files, nil
+	// Read template file
+	file, err := c.Assets.ReadFile(c.getTemplateFilePath())
+	if err != nil {
+		panic(err)
+	}
+
+	// Convert template file to golang's text/template
+	tmpl, err := template.New("NewSolutionFile").Parse(string(file))
+	if err != nil {
+		panic(err)
+	}
+
+	// New file path will be relative to our main.go location
+	out, err := os.Create(fmt.Sprintf("pkg/%s/%s.go", c.Challenge, name))
+	if err != nil {
+		panic(err)
+	}
+
+	tmpl.Execute(out, tokens)
+}
+
+
+func (c Challenge) getTemplateFilePath() string {
+	templatePath := ""
+
+	fs.WalkDir(c.Assets, c.Challenge, func(path string, d fs.DirEntry, err error) error {
+		if strings.HasSuffix(path, ".tmpl") {
+			templatePath = path
+		}
+
+		return nil
+	})
+
+	return templatePath
 }
 
 
