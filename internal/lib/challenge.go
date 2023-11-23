@@ -12,35 +12,27 @@ import (
 )
 
 
-type Challenger interface {
-	GetSolution(string) (*Solver, bool)
-}
-
-
 type Challenge struct {
 	Assets		*embed.FS
 	Challenge	string
 	Solution	string
-	DataSet		[]string
+	Scenarios	[]string
 	Algorithm	string
+
+	Solutions	map[string]Solver
 }
 
 
-func NewChallenge(name string, solution string, ds []string, algo string) Challenge {
-
-	challenge := Challenge{
-			Assets: &assets.Assets,
-			Challenge: name,
-			Solution: solution,
-			DataSet: ds,
-			Algorithm: algo,
-		}
-
-	return challenge
+func NewChallenge(name string, solutions map[string]Solver) *Challenge {
+	return &Challenge{
+		Assets: &assets.Assets,
+		Challenge: name,
+		Solutions: solutions,
+	}
 }
 
 
-func NewSolution(c Challenge, name string) {
+func (c Challenge) CreateSolution(name string) {
 
 	tokens := map[string]string{
 		"SolutionName": name,
@@ -68,6 +60,41 @@ func NewSolution(c Challenge, name string) {
 }
 
 
+func (c *Challenge) Solve() string {
+
+	solver, ok := c.Solutions[c.Solution]
+	if !ok {
+		panic(fmt.Sprintf("Invalid Solution name given for %s: %s", c.Challenge, c.Solution))
+	}
+
+	// Iterate through all provided scenarios...
+	for _, scenario := range c.Scenarios {
+		fmt.Printf("> Running scenario %s...\n", scenario)
+		tc := c.createTestCase(scenario)
+
+		// Each scenario provided must execute successfully
+		solver.Assemble(tc)
+		solver.Activate(tc)
+		Assert(tc)
+
+		fmt.Printf("> Scenario %s passed!\n", scenario)
+	}
+
+	// Once all sample scenarios have been executed successfully,
+	//	we may attempt to run the final "real data" scenario
+
+	tc := c.createTestCase("")
+
+	solver.Assemble(tc)
+	solver.Activate(tc)
+	// Assert() // We cannot assert this scenario; we don't know what the actual value will be!
+
+	// If everything is correct with the algorithm,
+	//	this should be your final solution
+	return tc.Actual
+}
+
+
 func (c Challenge) getTemplateFilePath() string {
 	templatePath := ""
 
@@ -83,24 +110,9 @@ func (c Challenge) getTemplateFilePath() string {
 }
 
 
-func (c Challenge) getDatasetInputPath(scenario string) string {
-	return fmt.Sprintf("%s/%s.%s.in", c.Challenge, c.Solution, scenario)
-}
-
-
-func (c Challenge) getAlgorithmOutputPath(scenario string) string {
-	return fmt.Sprintf("%s/%s.%s.%s.out", c.Challenge, c.Solution, scenario, c.Algorithm)
-}
-
-
-func (c Challenge) getSolutionInputPath() string {
-	return fmt.Sprintf("%s/%s.in", c.Challenge, c.Solution)
-}
-
-
 func (c Challenge) getScenarioData(scenario string) (string, string) {
 	// Read sample input file
-	inputPath := c.getDatasetInputPath(scenario)
+	inputPath := fmt.Sprintf("%s/%s.%s.in", c.Challenge, c.Solution, scenario)
 
 	input, err := c.Assets.ReadFile(inputPath)
 	if err != nil {
@@ -108,7 +120,7 @@ func (c Challenge) getScenarioData(scenario string) (string, string) {
 	}
 
 	// Read expected output file
-	outputPath := c.getAlgorithmOutputPath(scenario)
+	outputPath := fmt.Sprintf("%s/%s.%s.%s.out", c.Challenge, c.Solution, scenario, c.Algorithm)
 
 	output, err := c.Assets.ReadFile(outputPath)
 	if err != nil {
@@ -121,7 +133,7 @@ func (c Challenge) getScenarioData(scenario string) (string, string) {
 
 func (c Challenge) getSolutionData() (string, string) {
 	// Read input file
-	solutionInput := c.getSolutionInputPath()
+	solutionInput := fmt.Sprintf("%s/%s.in", c.Challenge, c.Solution)
 
 	input, err := c.Assets.ReadFile(solutionInput)
 	if err != nil {
@@ -132,13 +144,26 @@ func (c Challenge) getSolutionData() (string, string) {
 }
 
 
-func (c Challenge) Data(scenario string) (string, string) {
+// Create Test Case with scenario data
+func (c Challenge) createTestCase(scenario string) *TestCase {
+
+	var input, output string
+
 	switch scenario {
 	case "": // Get real data
-		return c.getSolutionData()
+		input, output = c.getSolutionData()
+		break
 	
-	default:
-		return c.getScenarioData(scenario)
+	default: // Get scenario data
+		input, output = c.getScenarioData(scenario)
+		break
+	}
+
+	return &TestCase{
+		Name: scenario,
+		Input: input,
+		Output: output,
+		Algorithm: c.Algorithm,
 	}
 }
 

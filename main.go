@@ -3,48 +3,86 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/kaitachi/go-challenges/internal/lib"
 	AOC2022 "github.com/kaitachi/go-challenges/pkg/AdventOfCode2022"
 )
 
 
-var challenges = map[string]lib.Challenger{
-	"AdventOfCode2022": &AOC2022.AdventOfCode2022{},
+var challenges = map[string]lib.Challenge{
+	"AdventOfCode2022": *AOC2022.GetChallenge(),
 }
 
 
 func main() {
 	args := os.Args[1:]
 
-	if len(args) == 3 && args[0] == "create" {
-		challenge := lib.NewChallenge(args[1], args[2], []string{""}, "")
-		lib.NewSolution(challenge, args[2])
+	challenge, action := retrieveChallenge(args)
 
-		os.Exit(0)
+	switch action {
+	case "create": // Creates new Solver with given Solution name
+		create(&challenge, args[1:])
+		break
+
+	case "solve": // Run Solver for given parameters
+		solve(&challenge, args[1:])
+		break
 	}
 
-	if len(args) < 4 {
-		panic("Usage: CHALLENGE PROBLEM ALGORITHM SCENARIO [...SCENARIO]")
+	os.Exit(0)
+}
+
+
+func retrieveChallenge(args []string) (lib.Challenge, string) {
+
+	// Validate user's choice
+	switch strings.ToLower(args[0]) {
+	case "create":
+		if len(args) < 3 {
+			panic("Usage: create CHALLENGE SOLUTION")
+		}
+
+		break
+
+	case "solve":
+		if len(args) < 5 {
+			panic("Usage: solve CHALLENGE SOLUTION ALGORITHM SCENARIO [...SCENARIO]")
+		}
+
+		break
+
+	default:
+		panic("Try adding `create` or `solve` arguments")
 	}
 
-	challengeName := args[0]
-	problemName := args[1]
-	algorithmName := args[2]
-	scenarios := args[3:]
+	// Fetch Challenge & Solution
+	challengeName := args[1]
+	solutionName := args[2]
 
 	challenge, ok := challenges[challengeName]
 	if !ok {
 		panic(fmt.Sprintf("Challenge %s not found!", challengeName))
 	}
 
-	problem, ok := challenge.GetSolution(problemName)
-	if !ok {
-		panic(fmt.Sprintf("Invalid Solution name given for %s: %s", challengeName, problemName))
-	}
+	challenge.Solution = solutionName
 
-	solution := lib.Solve(challenge, *problem, scenarios, algorithmName)
+	return challenge, strings.ToLower(args[0])
+}
 
-	fmt.Printf("> Solution for %s, problem %s (%s): %s\n", lib.NameOf(challenge), lib.NameOf(*problem), algorithmName, solution)
+
+func create(c *lib.Challenge, args []string) {
+	c.CreateSolution(args[1])
+}
+
+
+func solve(c *lib.Challenge, args []string) {
+
+	c.Algorithm = args[2]
+	c.Scenarios = args[3:]
+
+	solution := c.Solve()
+
+	fmt.Printf("> Solution for %s, problem %s (%s): %s\n", c.Challenge, c.Solution, c.Algorithm, solution)
 }
 

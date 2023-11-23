@@ -12,18 +12,6 @@ type TestCase struct {
 }
 
 
-// Create Test Case with scenario data
-func NewTestCase(input string, output string, scenario string, algorithm string) *TestCase {
-
-	return &TestCase{
-		Name: scenario,
-		Algorithm: algorithm,
-		Input: input,
-		Output: output,
-	}
-}
-
-
 // 3. Assert - Every Scenario should be verified
 func Assert(tc *TestCase) {
 	if tc.Output != tc.Actual {
