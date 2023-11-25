@@ -11,7 +11,8 @@ import (
 
 
 const nextImportLine string = "\t// <<NEXT_IMPORT>>"
-const nextSolutionLine string = "\t// <<NEXT>>"
+const nextChallengeLine string = "\t// <<NEXT_CHALLENGE>>"
+const nextSolutionLine string = "\t// <<NEXT_SOLUTION>>"
 
 type replacementMappings struct {
 	text	string
@@ -33,7 +34,7 @@ func CreateChallenge(c *Challenge) {
 			replace: fmt.Sprintf("\t\"github.com/kaitachi/go-challenges/pkg/%s\"\n%s", c.Challenge, nextImportLine),
 		},
 		{
-			text: nextSolutionLine,
+			text: nextChallengeLine,
 			replace: fmt.Sprintf("\t\"%s\": %s.Solutions,\n%s", c.Challenge, c.Challenge, nextSolutionLine),
 		},
 	}

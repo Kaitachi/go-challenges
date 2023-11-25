@@ -6,14 +6,14 @@ import (
 	"strings"
 
 	"github.com/kaitachi/go-challenges/internal/lib"
-	AOC2022 "github.com/kaitachi/go-challenges/pkg/AdventOfCode2022"
+	"github.com/kaitachi/go-challenges/pkg/AdventOfCode2022"
 	// <<NEXT_IMPORT>>
 )
 
 
 var challenges = map[string]map[string]lib.Solver{
-	"AdventOfCode2022": AOC2022.Solutions,
-	// <<NEXT>>
+	"AdventOfCode2022": AdventOfCode2022.Solutions,
+	// <<NEXT_CHALLENGE>>
 }
 
 

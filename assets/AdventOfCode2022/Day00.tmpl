@@ -1,4 +1,4 @@
-package AOC2022
+package AdventOfCode2022
 
 import (
 	"fmt"
