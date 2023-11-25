@@ -8,7 +8,8 @@ import (
 	"text/template"
 )
 
-func (c Challenge) CreateSolution(name string) {
+
+func CreateSolution(c *Challenge, name string) {
 
 	tokens := map[string]string{
 		"SolutionName": name,
@@ -49,3 +50,4 @@ func (c Challenge) getTemplateFilePath() string {
 
 	return templatePath
 }
+

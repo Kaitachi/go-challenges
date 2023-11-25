@@ -21,8 +21,8 @@ func main() {
 	challenge, action := retrieveChallenge(args)
 
 	switch action {
-	case "create": // Creates new Solver with given Solution name
-		create(&challenge, args[1:])
+	case "create:solution": // Creates new Solver with given Solution name
+		createSolution(&challenge, args[1:])
 		break
 
 	case "solve": // Run Solver for given parameters
@@ -38,7 +38,7 @@ func retrieveChallenge(args []string) (lib.Challenge, string) {
 
 	// Validate user's choice
 	switch strings.ToLower(args[0]) {
-	case "create":
+	case "create:solution":
 		if len(args) < 3 {
 			panic("Usage: create CHALLENGE SOLUTION")
 		}
@@ -71,8 +71,8 @@ func retrieveChallenge(args []string) (lib.Challenge, string) {
 }
 
 
-func create(c *lib.Challenge, args []string) {
-	c.CreateSolution(args[1])
+func createSolution(c *lib.Challenge, args []string) {
+	lib.CreateSolution(c, args[1])
 }
 
 
