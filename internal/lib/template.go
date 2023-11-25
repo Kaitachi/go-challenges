@@ -31,7 +31,7 @@ func CreateChallenge(c *Challenge) {
 		},
 		{
 			text: nextChallengeLine,
-			replace: fmt.Sprintf("\t\"%s\": %s.Solutions,\n%s", c.Challenge, c.Challenge, nextSolutionLine),
+			replace: fmt.Sprintf("\t\"%s\": %s.Solutions,\n%s", c.Challenge, c.Challenge, nextChallengeLine),
 		},
 	}
 
