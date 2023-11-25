@@ -9,10 +9,10 @@ import (
 )
 
 
-func CreateSolution(c *Challenge, name string) {
+func CreateSolution(c *Challenge) {
 
 	tokens := map[string]string{
-		"SolutionName": name,
+		"SolutionName": c.Solution,
 	}
 
 	// Read template file
@@ -28,7 +28,7 @@ func CreateSolution(c *Challenge, name string) {
 	}
 
 	// New file path will be relative to our main.go location
-	out, err := os.Create(fmt.Sprintf("pkg/%s/%s.go", c.Challenge, name))
+	out, err := os.Create(fmt.Sprintf("pkg/%s/%s.go", c.Challenge, c.Solution))
 	if err != nil {
 		panic(err)
 	}

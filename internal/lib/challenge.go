@@ -15,26 +15,19 @@ type Challenge struct {
 	Solution	string
 	Scenarios	[]string
 	Algorithm	string
-
-	Solutions	map[string]Solver
 }
 
 
-func NewChallenge(name string, solutions map[string]Solver) *Challenge {
+func NewChallenge(name string, solution string) *Challenge {
 	return &Challenge{
 		Assets: &assets.Assets,
 		Challenge: name,
-		Solutions: solutions,
+		Solution: solution,
 	}
 }
 
 
-func (c *Challenge) Solve() string {
-
-	solver, ok := c.Solutions[c.Solution]
-	if !ok {
-		panic(fmt.Sprintf("Invalid Solution name given for %s: %s", c.Challenge, c.Solution))
-	}
+func (c *Challenge) Solve(solver Solver) string {
 
 	// Iterate through all provided scenarios...
 	for _, scenario := range c.Scenarios {

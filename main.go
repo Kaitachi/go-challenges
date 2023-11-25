@@ -10,8 +10,8 @@ import (
 )
 
 
-var challenges = map[string]lib.Challenge{
-	"AdventOfCode2022": *AOC2022.GetChallenge(),
+var challenges = map[string]map[string]lib.Solver{
+	"AdventOfCode2022": *&AOC2022.Solutions,
 }
 
 
@@ -22,11 +22,11 @@ func main() {
 
 	switch action {
 	case "create:solution": // Creates new Solver with given Solution name
-		createSolution(&challenge, args[1:])
+		createSolution(challenge, args[1:])
 		break
 
 	case "solve": // Run Solver for given parameters
-		solve(&challenge, args[1:])
+		solve(challenge, args[1:])
 		break
 	}
 
@@ -34,7 +34,7 @@ func main() {
 }
 
 
-func retrieveChallenge(args []string) (lib.Challenge, string) {
+func retrieveChallenge(args []string) (*lib.Challenge, string) {
 
 	// Validate user's choice
 	switch strings.ToLower(args[0]) {
@@ -53,19 +53,13 @@ func retrieveChallenge(args []string) (lib.Challenge, string) {
 		break
 
 	default:
-		panic("Try adding `create` or `solve` arguments")
+		panic("Try adding `create:solution` or `solve` arguments")
 	}
 
-	// Fetch Challenge & Solution
+	// Create Challenge
 	challengeName := args[1]
 	solutionName := args[2]
-
-	challenge, ok := challenges[challengeName]
-	if !ok {
-		panic(fmt.Sprintf("Challenge %s not found!", challengeName))
-	}
-
-	challenge.Solution = solutionName
+	challenge := lib.NewChallenge(challengeName, solutionName)
 
 	return challenge, strings.ToLower(args[0])
 }
@@ -78,10 +72,16 @@ func createSolution(c *lib.Challenge, args []string) {
 
 func solve(c *lib.Challenge, args []string) {
 
+	// Retrieve Solution
+	solver, ok := challenges[c.Challenge][c.Solution]
+	if !ok {
+		panic(fmt.Sprintf("Solution %s not found!", c.Solution))
+	}
+
 	c.Algorithm = args[2]
 	c.Scenarios = args[3:]
 
-	solution := c.Solve()
+	solution := c.Solve(solver)
 
 	fmt.Printf("> Solution for %s, problem %s (%s): %s\n", c.Challenge, c.Solution, c.Algorithm, solution)
 }
