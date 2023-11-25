@@ -11,90 +11,67 @@ import (
 
 
 const nextImportLine string = "\t// <<NEXT_IMPORT>>"
-const nextSolutionLine string = "\t// <<NEXT>>" 
+const nextSolutionLine string = "\t// <<NEXT>>"
 
-
-func CreateSolution(c *Challenge) {
-
-	c.createSolutionFile()
-
-	c.appendSolutionToChallenge()
+type replacementMappings struct {
+	text	string
+	replace	string
 }
 
 
 func CreateChallenge(c *Challenge) {
 
-	c.createChallengeFile()
+	tokens := map[string]string{
+		"ChallengeName": c.Challenge,
+	}
 
-	c.appendChallengeToMain()
+	c.createFileFromTemplate("Challenge.tmpl", fmt.Sprintf("pkg/%s/%s.go", c.Challenge, c.Challenge), tokens)
+
+	replacements := []replacementMappings{
+		{
+			text: nextImportLine,
+			replace: fmt.Sprintf("\t\"github.com/kaitachi/go-challenges/pkg/%s\"\n%s", c.Challenge, nextImportLine),
+		},
+		{
+			text: nextSolutionLine,
+			replace: fmt.Sprintf("\t\"%s\": %s.Solutions,\n%s", c.Challenge, c.Challenge, nextSolutionLine),
+		},
+	}
+
+	c.appendNewFileToParent("main.go", replacements)
 }
 
 
-func (c *Challenge) createSolutionFile() {
+func CreateSolution(c *Challenge) {
 
 	tokens := map[string]string{
 		"SolutionName": c.Solution,
 	}
 
-	// Read Template file
-	file, err := c.Assets.ReadFile(c.getTemplateFilePath())
-	if err != nil {
-		panic(err)
+	c.createFileFromTemplate(c.getTemplateFilePath(), fmt.Sprintf("pkg/%s/%s.go", c.Challenge, c.Solution), tokens)
+
+	replacements := []replacementMappings{
+		{
+			text: nextSolutionLine,
+			replace: fmt.Sprintf("\t\"%s\": &%s{},\n%s", c.Solution, c.Solution, nextSolutionLine),
+
+		},
 	}
 
-	// Convert Template file to golang's text/template
-	tmpl, err := template.New("NewSolutionFile").Parse(string(file))
-	if err != nil {
-		panic(err)
-	}
-
-	// New file path will be relative to our main.go location
-	out, err := os.Create(fmt.Sprintf("pkg/%s/%s.go", c.Challenge, c.Solution))
-	if err != nil {
-		panic(err)
-	}
-
-	tmpl.Execute(out, tokens)
+	c.appendNewFileToParent(fmt.Sprintf("pkg/%s/%s.go", c.Challenge, c.Challenge), replacements)
 }
 
 
-func (c *Challenge) appendSolutionToChallenge() {
-
-	// File name to be read/written
-	filePath := fmt.Sprintf("pkg/%s/%s.go", c.Challenge, c.Challenge)
+func (c *Challenge) createFileFromTemplate(src string, dest string, tokens map[string]string) {
 	
-	// Create string that will be added to our Challenge file
-	newSolutionLine := fmt.Sprintf("\t\"%s\": &%s{},\n%s", c.Solution, c.Solution, nextSolutionLine)
-
-	// Read Challenge file
-	file, err := os.ReadFile(filePath)
-	if err != nil {
-		panic(err)
-	}
-
-	// Replace template string
-	output := bytes.ReplaceAll(file, []byte(nextSolutionLine), []byte(newSolutionLine))
-
-	if err = os.WriteFile(filePath, output, 0644); err != nil {
-		panic(err)
-	}
-}
-
-
-func (c *Challenge) createChallengeFile() {
-
-	tokens := map[string]string{
-		"ChallengeName": c.Challenge,
-	}
-
 	// Read Template file
-	file, err := c.Assets.ReadFile("Challenge.tmpl")
+	file, err := c.Assets.ReadFile(src)
 	if err != nil {
 		panic(err)
 	}
 
 	// Convert Template file to golang's text/template
-	tmpl, err := template.New("NewChallengeFile").Parse(string(file))
+	tmpl, err := template.New("NewTemplateFile").Parse(string(file))
 	if err != nil {
 		panic(err)
 	}
@@ -106,7 +83,7 @@ func (c *Challenge) createChallengeFile() {
 	}
 
 	// New file path will be relative to our main.go location
-	out, err := os.Create(fmt.Sprintf("pkg/%s/%s.go", c.Challenge, c.Challenge))
+	out, err := os.Create(dest)
 	if err != nil {
 		panic(err)
 	}
@@ -115,27 +92,21 @@ func (c *Challenge) createChallengeFile() {
 }
 
 
-func (c *Challenge) appendChallengeToMain() {
-
-	// File name to be read/written
-	filePath := "main.go"
-	
-	// Create string that will be added to our Challenge file
-	newImportLine := fmt.Sprintf("\t\"github.com/kaitachi/go-challenges/pkg/%s\"\n%s", c.Challenge, nextImportLine)
-	newChallengeLine := fmt.Sprintf("\t\"%s\": %s.Solutions,\n%s", c.Challenge, c.Challenge, nextSolutionLine)
+func (c *Challenge) appendNewFileToParent(src string, tokens []replacementMappings) {
 
 	// Read Challenge file
-	file, err := os.ReadFile(filePath)
+	file, err := os.ReadFile(src)
 	if err != nil {
 		panic(err)
 	}
 
 	// Replace template string
 	output := file
-	output = bytes.ReplaceAll(output, []byte(nextImportLine), []byte(newImportLine))
-	output = bytes.ReplaceAll(output, []byte(nextSolutionLine), []byte(newChallengeLine))
+	for _, token := range tokens {
+		output = bytes.ReplaceAll(output, []byte(token.text), []byte(token.replace))
+	}
 
-	if err = os.WriteFile(filePath, output, 0644); err != nil {
+	if err = os.WriteFile(src, output, 0644); err != nil {
 		panic(err)
 	}
 }
