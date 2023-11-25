@@ -7,11 +7,13 @@ import (
 
 	"github.com/kaitachi/go-challenges/internal/lib"
 	AOC2022 "github.com/kaitachi/go-challenges/pkg/AdventOfCode2022"
+	// <<NEXT_IMPORT>>
 )
 
 
 var challenges = map[string]map[string]lib.Solver{
-	"AdventOfCode2022": *&AOC2022.Solutions,
+	"AdventOfCode2022": AOC2022.Solutions,
+	// <<NEXT>>
 }
 
 
@@ -21,6 +23,10 @@ func main() {
 	challenge, action := retrieveChallenge(args)
 
 	switch action {
+	case "create:challenge": // Creates new Challenge with given name
+		createChallenge(challenge, args[1:])
+		break
+
 	case "create:solution": // Creates new Solver with given Solution name
 		createSolution(challenge, args[1:])
 		break
@@ -38,9 +44,17 @@ func retrieveChallenge(args []string) (*lib.Challenge, string) {
 
 	// Validate user's choice
 	switch strings.ToLower(args[0]) {
+	case "create:challenge":
+		if len(args) < 2 {
+			panic("Usage: create:challenge CHALLENGE")
+		}
+
+		args = append(args, "") // Adding empty arg to prevent problems further below
+		break
+
 	case "create:solution":
 		if len(args) < 3 {
-			panic("Usage: create CHALLENGE SOLUTION")
+			panic("Usage: create:solution CHALLENGE SOLUTION")
 		}
 
 		break
@@ -62,6 +76,11 @@ func retrieveChallenge(args []string) (*lib.Challenge, string) {
 	challenge := lib.NewChallenge(challengeName, solutionName)
 
 	return challenge, strings.ToLower(args[0])
+}
+
+
+func createChallenge(c *lib.Challenge, args []string) {
+	lib.CreateChallenge(c)
 }
 
 
