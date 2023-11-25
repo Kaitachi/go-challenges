@@ -1,7 +1,5 @@
 package lib
 
-import "fmt"
-
 type TestCase struct {
 	Name		string
 	Algorithm	string
@@ -12,10 +10,26 @@ type TestCase struct {
 }
 
 
-// 3. Assert - Every Scenario should be verified
-func Assert(tc *TestCase) {
-	if tc.Output != tc.Actual {
-		panic(fmt.Sprintf("> Sample scenario %s failed! Expected: %s; actual: %s.", tc.Name, tc.Output, tc.Actual))
+// Create Test Case with scenario data
+func NewTestCase(c *Challenge, scenario string) *TestCase {
+
+	var input, output string
+
+	switch scenario {
+	case "": // Get real data
+		input, output = c.getSolutionData()
+		break
+	
+	default: // Get scenario data
+		input, output = c.getScenarioData(scenario)
+		break
+	}
+
+	return &TestCase{
+		Name: scenario,
+		Input: input,
+		Output: output,
+		Algorithm: c.Algorithm,
 	}
 }
 

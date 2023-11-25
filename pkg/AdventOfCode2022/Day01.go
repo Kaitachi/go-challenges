@@ -40,7 +40,6 @@ func (s *Day01) Assemble(tc *lib.TestCase) {
 	}
 
 	s.data = elves
-	tc.Output = strings.TrimSpace(tc.Output)
 }
 
 
