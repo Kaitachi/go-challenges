@@ -66,7 +66,7 @@ func retrieveChallenge(args []string) (*lib.Challenge, string) {
 
 
 func createSolution(c *lib.Challenge, args []string) {
-	lib.CreateSolution(c, args[1])
+	lib.CreateSolution(c)
 }
 
 

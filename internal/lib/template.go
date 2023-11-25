@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"bytes"
 	"fmt"
 	"io/fs"
 	"os"
@@ -9,19 +10,30 @@ import (
 )
 
 
+const nextSolutionLine string = "\t// {{.NEXT}}" 
+
+
 func CreateSolution(c *Challenge) {
+
+	c.createSolutionFile()
+
+	c.appendSolutionToChallenge()
+}
+
+
+func (c *Challenge) createSolutionFile() {
 
 	tokens := map[string]string{
 		"SolutionName": c.Solution,
 	}
 
-	// Read template file
+	// Read Template file
 	file, err := c.Assets.ReadFile(c.getTemplateFilePath())
 	if err != nil {
 		panic(err)
 	}
 
-	// Convert template file to golang's text/template
+	// Convert Template file to golang's text/template
 	tmpl, err := template.New("NewSolutionFile").Parse(string(file))
 	if err != nil {
 		panic(err)
@@ -34,6 +46,29 @@ func CreateSolution(c *Challenge) {
 	}
 
 	tmpl.Execute(out, tokens)
+}
+
+
+func (c *Challenge) appendSolutionToChallenge() {
+
+	// File name to be read/written
+	filePath := fmt.Sprintf("pkg/%s/%s.go", c.Challenge, c.Challenge)
+	
+	// Create string that will be added to our Challenge file
+	newSolutionLine := fmt.Sprintf("\t\"%s\": &%s{},\n%s", c.Solution, c.Solution, nextSolutionLine)
+
+	// Read Challenge file
+	file, err := os.ReadFile(filePath)
+	if err != nil {
+		panic(err)
+	}
+
+	// Replace template string
+	output := bytes.ReplaceAll(file, []byte(nextSolutionLine), []byte(newSolutionLine))
+
+	if err = os.WriteFile(filePath, output, 0644); err != nil {
+		panic(err)
+	}
 }
 
 
