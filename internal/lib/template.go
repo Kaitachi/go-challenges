@@ -22,11 +22,7 @@ type replacementMappings struct {
 
 func CreateChallenge(c *Challenge) {
 
-	tokens := map[string]string{
-		"ChallengeName": c.Challenge,
-	}
-
-	c.createFileFromTemplate("Challenge.tmpl", fmt.Sprintf("pkg/%s/%s.go", c.Challenge, c.Challenge), tokens)
+	c.createFileFromTemplate("Challenge.tmpl", fmt.Sprintf("pkg/%s/%s.go", c.Challenge, c.Challenge))
 
 	replacements := []replacementMappings{
 		{
@@ -45,11 +41,7 @@ func CreateChallenge(c *Challenge) {
 
 func CreateSolution(c *Challenge) {
 
-	tokens := map[string]string{
-		"SolutionName": c.Solution,
-	}
-
-	c.createFileFromTemplate(c.getTemplateFilePath(), fmt.Sprintf("pkg/%s/%s.go", c.Challenge, c.Solution), tokens)
+	c.createFileFromTemplate(c.getTemplateFilePath(), fmt.Sprintf("pkg/%s/%s.go", c.Challenge, c.Solution))
 
 	replacements := []replacementMappings{
 		{
@@ -63,7 +55,7 @@ func CreateSolution(c *Challenge) {
 }
 
 
-func (c *Challenge) createFileFromTemplate(src string, dest string, tokens map[string]string) {
+func (c *Challenge) createFileFromTemplate(src string, dest string) {
 	
 	// Read Template file
 	file, err := c.Assets.ReadFile(src)
@@ -89,7 +81,7 @@ func (c *Challenge) createFileFromTemplate(src string, dest string, tokens map[s
 		panic(err)
 	}
 
-	tmpl.Execute(out, tokens)
+	tmpl.Execute(out, c)
 }
 
 
