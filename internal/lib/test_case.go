@@ -17,11 +17,11 @@ func NewTestCase(c *Challenge, scenario string) *TestCase {
 
 	switch scenario {
 	case "": // Get real data
-		input, output = c.getSolutionData()
+		input, output = c.getFileData("")
 		break
 	
 	default: // Get scenario data
-		input, output = c.getScenarioData(scenario)
+		input, output = c.getFileData(scenario)
 		break
 	}
 

@@ -57,36 +57,35 @@ func (c *Challenge) Solve(solver Solver) string {
 }
 
 
-func (c Challenge) getScenarioData(scenario string) (string, string) {
-	// Read sample input file
-	inputPath := fmt.Sprintf("%s/%s.%s.in", c.Challenge, c.Solution, scenario)
+func (c Challenge) getFileData(scenario string) (string, string) {
+	// Declare pattern strings
+	var inputPattern = "%s/%s.%s.in"
+	var outputPattern = "%s/%s.%s.%s.out"
 
+	if scenario == "" {
+		inputPattern = "%s/%s.in%.s" // Hacky way to bypass weirdness on Sprintf
+	}
+
+	// Read input file
+	inputPath := fmt.Sprintf(inputPattern, c.Challenge, c.Solution, scenario)
 	input, err := c.Assets.ReadFile(inputPath)
 	if err != nil {
+		print(input)
 		panic(err)
 	}
 
-	// Read expected output file
-	outputPath := fmt.Sprintf("%s/%s.%s.%s.out", c.Challenge, c.Solution, scenario, c.Algorithm)
+	// No scenario provided; we must be reading our unknown scenario
+	if scenario == "" {
+		return string(input), ""
+	}
 
+	// Read expected output file
+	outputPath := fmt.Sprintf(outputPattern, c.Challenge, c.Solution, scenario, c.Algorithm)
 	output, err := c.Assets.ReadFile(outputPath)
 	if err != nil {
 		panic(err)
 	}
 
 	return string(input), strings.TrimSpace(string(output))
-}
-
-
-func (c Challenge) getSolutionData() (string, string) {
-	// Read input file
-	solutionInput := fmt.Sprintf("%s/%s.in", c.Challenge, c.Solution)
-
-	input, err := c.Assets.ReadFile(solutionInput)
-	if err != nil {
-		panic(err)
-	}
-
-	return string(input), ""
 }
 
