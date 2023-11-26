@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path"
 	"strings"
 	"text/template"
 )
@@ -70,7 +71,7 @@ func (c *Challenge) createFileFromTemplate(src string, dest string) {
 	}
 
 	// Create new folder location if it doesn't exist
-	err = os.MkdirAll(fmt.Sprintf("pkg/%s/", c.Challenge), 0744)
+	err = os.MkdirAll(path.Dir(dest), 0744)
 	if err != nil {
 		panic(err)
 	}
