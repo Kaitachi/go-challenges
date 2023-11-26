@@ -34,6 +34,10 @@ func main() {
 	case "solve": // Run Solver for given parameters
 		solve(challenge, args[1:])
 		break
+
+	case "fetch":
+		fetch(challenge)
+		break
 	}
 
 	os.Exit(0)
@@ -62,6 +66,13 @@ func retrieveChallenge(args []string) (*lib.Challenge, string) {
 	case "solve":
 		if len(args) < 5 {
 			panic("Usage: solve CHALLENGE SOLUTION ALGORITHM SCENARIO [...SCENARIO]")
+		}
+
+		break
+
+	case "fetch":
+		if len(args) < 3 {
+			panic("Usage: fetch CHALLENGE SOLUTION")
 		}
 
 		break
@@ -103,5 +114,12 @@ func solve(c *lib.Challenge, args []string) {
 	solution := c.Solve(solver)
 
 	fmt.Printf("> Solution for %s, problem %s (%s): %s\n", c.Challenge, c.Solution, c.Algorithm, solution)
+}
+
+
+func fetch(c *lib.Challenge) {
+	s := lib.GetAdventOfCodeScraper()
+
+	s.Scrape(c)
 }
 
