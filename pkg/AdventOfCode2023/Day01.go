@@ -84,30 +84,26 @@ func (s Day01) part02() string {
 		words += "|" + key
 	}
 
-	rewords := regexp.MustCompile(words[1:])
+	re := regexp.MustCompile(fmt.Sprintf("%s", words[1:]))
 
 	// Grab entries from original array
 	var sum int = 0
 
 	for _, line := range s.data {
-		fmt.Println("---", line)
 
-		idx := rewords.FindAllStringSubmatchIndex(line, -1)
+		idx := re.FindAllStringSubmatchIndex(line, -1)
 
-		fmt.Println(idx)
-
-		for _, match := range idx {
-			fmt.Println(line[match[0]:match[1]])
-			fmt.Println("------")
+		if false {
+			fmt.Println(">>> ", line)
+			fmt.Println(idx)
 		}
 
 		d0 := digits[line[idx[0][0]:idx[0][1]]]
-		d1 := digits[line[idx[len(idx)-1][0]:idx[len(idx)-1][1]]]
+		d1 := digits[search(line, re)]
 
 		// Sum array
 		number := d0 * 10 + d1
 
-		fmt.Println(">> ", number)
 		sum += number
 	}
 
@@ -123,8 +119,6 @@ func findSubstrings(array []string, re0 *regexp.Regexp, re1 *regexp.Regexp) int 
 		d0 := re0.FindStringSubmatch(line)
 		d1 := re1.FindStringSubmatch(line)
 
-		fmt.Println(d0)
-
 		number, _ := strconv.Atoi(d0[1] + d1[1])
 
 		// Sum array
@@ -132,5 +126,21 @@ func findSubstrings(array []string, re0 *regexp.Regexp, re1 *regexp.Regexp) int 
 	}
 
 	return sum
+}
+
+
+func search(line string, re *regexp.Regexp) string {
+
+
+
+		for i := len(line); i >= 0; i-- {
+			idx := re.FindAllStringSubmatchIndex(line[i:], -1)
+
+			if len(idx) > 0 {
+				return line[idx[0][0]+i:idx[0][1]+i]
+			}
+		}
+
+	return ""
 }
 
