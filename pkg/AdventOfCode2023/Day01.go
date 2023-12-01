@@ -3,7 +3,6 @@ package AdventOfCode2023
 import (
 	"fmt"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/kaitachi/go-challenges/internal/lib"
@@ -43,15 +42,19 @@ func (s *Day01) Activate(tc *lib.TestCase) {
 
 func (s Day01) part01() string {
 
-	// Use regex to find digit in first position
-	first := regexp.MustCompile("^(?:[a-zA-Z]*)(\\d)")
+	digits := map[string]int{
+		"1": 1,
+		"2": 2,
+		"3": 3,
+		"4": 4,
+		"5": 5,
+		"6": 6,
+		"7": 7,
+		"8": 8,
+		"9": 9,
+	}
 
-	// Use regex to find digit in last position
-	last := regexp.MustCompile("(\\d)(?:[a-zA-Z]*)$")
-
-	sum := findSubstrings(s.data, first, last)
-
-	return fmt.Sprintf("%d", sum)
+	return fmt.Sprintf("%d", calculateSum(s.data, digits))
 }
 
 
@@ -78,50 +81,35 @@ func (s Day01) part02() string {
 		"9": 9,
 	}
 
-	words := ""
-
-	for key, _ := range digits {
-		words += "|" + key
-	}
-
-	re := regexp.MustCompile(fmt.Sprintf("%s", words[1:]))
-
-	// Grab entries from original array
-	var sum int = 0
-
-	for _, line := range s.data {
-
-		idx := re.FindAllStringSubmatchIndex(line, -1)
-
-		if false {
-			fmt.Println(">>> ", line)
-			fmt.Println(idx)
-		}
-
-		d0 := digits[line[idx[0][0]:idx[0][1]]]
-		d1 := digits[search(line, re)]
-
-		// Sum array
-		number := d0 * 10 + d1
-
-		sum += number
-	}
-
-	return fmt.Sprintf("%d", sum)
+	return fmt.Sprintf("%d", calculateSum(s.data, digits))
 }
 
 
-func findSubstrings(array []string, re0 *regexp.Regexp, re1 *regexp.Regexp) int {
+func concatenateKeys(m map[string]int, s string) string {
+	words := ""
+
+	for key, _ := range m {
+		words += "|" + key
+	}
+
+	return words[len(s):]
+}
+
+
+func calculateSum(array []string, digits map[string]int) int {
+	re := regexp.MustCompile(fmt.Sprintf("%s", concatenateKeys(digits, "|")))
+
 	// Grab entries from original array
 	var sum int = 0
 
 	for _, line := range array {
-		d0 := re0.FindStringSubmatch(line)
-		d1 := re1.FindStringSubmatch(line)
 
-		number, _ := strconv.Atoi(d0[1] + d1[1])
+		d0 := digits[search(line, re)]
+		d1 := digits[reverseSearch(line, re)]
 
 		// Sum array
+		number := d0 * 10 + d1
+
 		sum += number
 	}
 
@@ -130,16 +118,20 @@ func findSubstrings(array []string, re0 *regexp.Regexp, re1 *regexp.Regexp) int 
 
 
 func search(line string, re *regexp.Regexp) string {
+	idx := re.FindAllStringSubmatchIndex(line, -1)
+
+	return line[idx[0][0]:idx[0][1]]
+}
 
 
+func reverseSearch(line string, re *regexp.Regexp) string {
+	for i := len(line); i >= 0; i-- {
+		idx := re.FindAllStringSubmatchIndex(line[i:], -1)
 
-		for i := len(line); i >= 0; i-- {
-			idx := re.FindAllStringSubmatchIndex(line[i:], -1)
-
-			if len(idx) > 0 {
-				return line[idx[0][0]+i:idx[0][1]+i]
-			}
+		if len(idx) > 0 {
+			return line[idx[0][0]+i:idx[0][1]+i]
 		}
+	}
 
 	return ""
 }
