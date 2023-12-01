@@ -2,6 +2,7 @@ package AdventOfCode2023
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -9,36 +10,16 @@ import (
 )
 
 type Day01 struct {
-	data [][]int
+	data []string
 }
 
 
 // 1. Assemble - How should we transform the data from our input files?
 func (s *Day01) Assemble(tc *lib.TestCase) {
 
-	elvesStrings := strings.Split(tc.Input, "\n\n")
-	elves := [][]int{}
-
-	for _, elf := range elvesStrings {
-		items := strings.Split(elf, "\n")
-		collection := []int{}
-
-		for _, item := range items {
-			item = strings.TrimSpace(item)
-			if item == "" { continue }
-
-			i, err := strconv.Atoi(item)
-			if err != nil {
-				panic(err)
-			}
-
-			collection = append(collection, i)
-		}
-
-		elves = append(elves, collection)
-	}
-
-	s.data = elves
+	lines := strings.Split(tc.Input, "\n")
+	
+	s.data = lines[:len(lines)-1]
 }
 
 
@@ -62,7 +43,26 @@ func (s *Day01) Activate(tc *lib.TestCase) {
 
 func (s Day01) part01() string {
 
-	return fmt.Sprintf("%d", -1)
+	// Use regex to find digit in first position
+	first := regexp.MustCompile("^(?:[a-zA-Z]*)(\\d)")
+
+	// Use regex to find digit in last position
+	last := regexp.MustCompile("(\\d)(?:[a-zA-Z]*)$")
+
+	// Grab entries from original array
+	var sum int = 0
+
+	for _, line := range s.data {
+		d0 := first.FindStringSubmatch(line)
+		d1 := last.FindStringSubmatch(line)
+
+		number, _ := strconv.Atoi(d0[1] + d1[1])
+
+		// Sum array
+		sum += number
+	}
+
+	return fmt.Sprintf("%d", sum)
 }
 
 
