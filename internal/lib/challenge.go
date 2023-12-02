@@ -1,9 +1,9 @@
 package lib
 
 import (
+	"bytes"
 	"embed"
 	"fmt"
-	"strings"
 
 	"github.com/kaitachi/go-challenges/assets"
 )
@@ -70,13 +70,12 @@ func (c Challenge) getFileData(scenario string) (string, string) {
 	inputPath := fmt.Sprintf(inputPattern, c.Challenge, c.Solution, scenario)
 	input, err := c.Assets.ReadFile(inputPath)
 	if err != nil {
-		print(input)
 		panic(err)
 	}
 
 	// No scenario provided; we must be reading our unknown scenario
 	if scenario == "" {
-		return string(input), ""
+		return string(bytes.TrimSpace(input)), ""
 	}
 
 	// Read expected output file
@@ -86,6 +85,6 @@ func (c Challenge) getFileData(scenario string) (string, string) {
 		panic(err)
 	}
 
-	return string(input), strings.TrimSpace(string(output))
+	return string(bytes.TrimSpace(input)), string(bytes.TrimSpace(output))
 }
 
