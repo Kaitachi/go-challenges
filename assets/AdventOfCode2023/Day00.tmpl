@@ -44,19 +44,14 @@ func (s *{{.Solution}}) Assemble(tc *lib.TestCase) {
 
 // 2. Activate - Take our transformed input data and make the core logic needed to resolve this Problem
 func (s *{{.Solution}}) Activate(tc *lib.TestCase) {
-
-	var result string
-
+	// Assign final value to TestCase.Actual field
 	switch tc.Algorithm {
 	case "part01":
-		result = s.part01()
+		tc.Actual = s.part01()
 		
 	case "part02":
-		result = s.part02()
+		tc.Actual = s.part02()
 	}
-
-	// Assign final value to TestCase.Actual field
-	tc.Actual = result
 }
 
 
