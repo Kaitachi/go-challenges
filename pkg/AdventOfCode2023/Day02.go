@@ -2,6 +2,7 @@ package AdventOfCode2023
 
 import (
 	"fmt"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -114,6 +115,22 @@ func (s Day02) part01() string {
 
 func (s Day02) part02() string {
 
-	return fmt.Sprintf("%d", -1)
+	power_sum := 0
+
+	for _, game := range s.data {
+		min_r := 0
+		min_g := 0
+		min_b := 0
+
+		for _, round := range game.rounds {
+			min_r = int(math.Max(float64(min_r), float64(round.red)))
+			min_g = int(math.Max(float64(min_g), float64(round.green)))
+			min_b = int(math.Max(float64(min_b), float64(round.blue)))
+		}
+
+		power_sum += min_r * min_g * min_b
+	}
+
+	return fmt.Sprintf("%d", power_sum)
 }
 
