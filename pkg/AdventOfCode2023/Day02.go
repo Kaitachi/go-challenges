@@ -11,66 +11,13 @@ import (
 )
 
 type Day02 struct {
-	data []CubeGame
-}
-
-
-type CubeGame struct {
-	id int
-	rounds []CubeGameRound
-}
-
-
-type CubeGameRound struct {
-	red int
-	green int
-	blue int
+	data []string
 }
 
 
 // 1. Assemble - How should we transform the data from our input files?
 func (s *Day02) Assemble(tc *lib.TestCase) {
-
-	s.data = []CubeGame{}
-	games := strings.Split(tc.Input, "\n")
-
-	re_game := regexp.MustCompile(`Game (\d+): `)
-	re_round := regexp.MustCompile(`; `)
-	re_r := regexp.MustCompile(`(\d+) red`)
-	re_g := regexp.MustCompile(`(\d+) green`)
-	re_b := regexp.MustCompile(`(\d+) blue`)
-
-	for _, line := range games[:len(games)-1] {
-		game := CubeGame{}
-
-		if id, err := strconv.Atoi(re_game.FindStringSubmatch(line)[1]); err == nil {
-			game.id = id
-		}
-
-		for _, v := range re_round.Split(line, -1) {
-			round := CubeGameRound{}
-
-			match_r := re_r.FindStringSubmatch(v)
-			match_g := re_g.FindStringSubmatch(v)
-			match_b := re_b.FindStringSubmatch(v)
-
-			if len(match_r) > 1 {
-				round.red, _ = strconv.Atoi(match_r[1])
-			}
-
-			if len(match_g) > 1 {
-				round.green, _ = strconv.Atoi(match_g[1])
-			}
-
-			if len(match_b) > 1 {
-				round.blue, _ = strconv.Atoi(match_b[1])
-			}
-
-			game.rounds = append(game.rounds, round)
-		}
-
-		s.data = append(s.data, game)
-	}
+	s.data = strings.Split(tc.Input, "\n")
 }
 
 
@@ -93,20 +40,22 @@ func (s *Day02) Activate(tc *lib.TestCase) {
 
 
 func (s Day02) part01() string {
-
-	max_r := 12
-	max_g := 13
-	max_b := 14
 	id_sum := 0
 
-	next_game: for _, game := range s.data {
-		for _, round := range game.rounds {
-			if round.red > max_r || round.green > max_g || round.blue > max_b {
+	max_allowed := map[string]float64{
+		"red": 12,
+		"green": 13,
+		"blue": 14,
+	}
+
+	next_game: for id, game := range maxCubesPerGame(s.data) {
+		for color, max := range max_allowed {
+			if game[color] > max {
 				continue next_game
 			}
 		}
 
-		id_sum += game.id
+		id_sum += id+1
 	}
 
 	return fmt.Sprintf("%d", id_sum)
@@ -114,23 +63,44 @@ func (s Day02) part01() string {
 
 
 func (s Day02) part02() string {
+	power_sum := float64(0)
 
-	power_sum := 0
+	for _, game := range maxCubesPerGame(s.data) {
+		game_product := float64(1)
 
-	for _, game := range s.data {
-		min_r := 0
-		min_g := 0
-		min_b := 0
-
-		for _, round := range game.rounds {
-			min_r = int(math.Max(float64(min_r), float64(round.red)))
-			min_g = int(math.Max(float64(min_g), float64(round.green)))
-			min_b = int(math.Max(float64(min_b), float64(round.blue)))
+		for _, max := range game {
+			game_product *= max
 		}
 
-		power_sum += min_r * min_g * min_b
+		power_sum += game_product
 	}
 
-	return fmt.Sprintf("%d", power_sum)
+	return fmt.Sprintf("%.0f", power_sum)
+}
+
+
+func maxCubesPerGame(games []string) []map[string]float64 {
+	re_cubes := regexp.MustCompile(`(\d+) (red|green|blue)`)
+	game_cubes := make([]map[string]float64, 0)
+
+	for _, game := range games {
+		cubes := re_cubes.FindAllStringSubmatch(game, -1)
+
+		max_cubes := map[string]float64{
+			"red": 0,
+			"green": 0,
+			"blue": 0,
+		}
+
+		for _, match := range cubes {
+			if count, err := strconv.ParseFloat(match[1], 64); err == nil {
+				max_cubes[match[2]] = math.Max(max_cubes[match[2]], count)
+			}
+		}
+
+		game_cubes = append(game_cubes, max_cubes)
+	}
+
+	return game_cubes
 }
 
