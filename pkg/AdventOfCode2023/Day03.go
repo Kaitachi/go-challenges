@@ -110,7 +110,28 @@ func (s Day03) part01() string {
 
 func (s Day03) part02() string {
 
-	return fmt.Sprintf("%d", -1)
+	total := 0
+
+	// Iterate through symbols list
+	for row, line := range s.symbols {
+		for col, part := range line {
+			if part == "*" {
+				subtotal := 1
+				numbers := findPointersAround(&s, row, col)
+
+				// Only append multiplication if there are exactly two numbers around this part
+				if len(numbers) == 2 {
+					for ptr, _ := range numbers {
+						subtotal *= *ptr
+					}
+
+					total += subtotal
+				}
+			}
+		}
+	}
+
+	return fmt.Sprintf("%d", total)
 }
 
 
