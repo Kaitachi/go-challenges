@@ -31,7 +31,7 @@ func (s *Day04) Assemble(tc *lib.TestCase) {
 
 	for row, line := range input {
 		card := card{
-			id: row,
+			id: row+1,
 		}
 
 		re_parts := regexp.MustCompile(`^(?P<Card>Card\s+\d+:)\s+(?P<Numbers>.*)\s+\|\s+(?P<Calls>.*)$`)
@@ -96,6 +96,35 @@ func (s Day04) part01() string {
 
 func (s Day04) part02() string {
 
-	return fmt.Sprintf("%d", -1)
+	// Initialize map containing amount of cards held
+	card_count := make(map[int]int, len(s.data))
+	for _, card := range s.data {
+		card_count[card.id] = 1
+	}
+
+	for _, card := range s.data {
+		matches := 0
+
+		for _, call := range card.winning {
+			if slices.Contains(card.numbers, call) {
+				matches += 1
+			}
+		}
+
+		for i := 1; i <= matches; i++ {
+			//fmt.Println("> Adding ", card_count[card.id], " to Card ", card.id + i)
+			card_count[card.id+i] += card_count[card.id]
+		}
+		//fmt.Printf("%v\n", card_count)
+	}
+
+	//fmt.Printf("%v\n", card_count)
+
+	total := 0
+	for _, count := range card_count {
+		total += count
+	}
+
+	return fmt.Sprintf("%d", total)
 }
 
