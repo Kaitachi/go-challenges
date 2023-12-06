@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -146,12 +147,66 @@ func (s Day05) part02() string {
 }
 
 
+func (s Day05) part02b() string {
+
+	maps := make(map[string]func(int) int, len(s.maps))
+
+	for name, transforms := range s.transforms {
+		maps[name] = inverseMapper(transforms)
+	}
+
+	sort.Slice(s.maps, func(i, j int) bool { return j < i })
+
+	seed := -1
+
+	for i := 0; seed < 0; i++ {
+		//fmt.Println("> Checking ", i)
+		value := i
+
+		for _, transform := range s.maps {
+			//fmt.Printf("-> %s", transform)
+			value = maps[transform](value)
+			//fmt.Printf(" -> [%d]", value)
+		}
+
+		for pair := 0; pair < len(s.seeds); pair += 2 {
+			start := s.seeds[pair]
+			end := s.seeds[pair] + s.seeds[pair+1]
+
+			if start <= value && value < end {
+				//fmt.Println("FOUND MATCH")
+				seed = i
+			}
+		}
+	}
+
+	return fmt.Sprintf("%d", seed)
+}
+
+
 func mapper(transforms []transform) func(int) int {
 	return func(key int) int {
 		for _, t := range transforms {
 			if t.source <= key && key < t.source + t.length {
 				offset := key - t.source
 				out := t.dest + offset
+
+				//fmt.Printf("> HIT %d (offset %d) => %d \n", key, offset, out)
+				return out
+			}
+		}
+
+		return key
+	}
+}
+
+
+func inverseMapper(transforms []transform) func(int) int {
+	return func(key int) int {
+		for _, t := range transforms {
+			if t.dest <= key && key < t.dest + t.length {
+				offset := key - t.dest
+				out := t.source + offset
 
 				//fmt.Printf("> HIT %d (offset %d) => %d \n", key, offset, out)
 				return out
