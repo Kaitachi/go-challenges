@@ -83,6 +83,28 @@ func (s Day06) part01() string {
 
 func (s Day06) part02() string {
 
-	return fmt.Sprintf("%d", -1)
+	records := 0
+
+	t := ""
+	d := ""
+
+	for i := 0; i < len(s.data["Time"]); i++ {
+		t += fmt.Sprint(s.data["Time"][i])
+		d += fmt.Sprint(s.data["Distance"][i])
+	}
+
+	time, _ := strconv.Atoi(t)
+	dist, _ := strconv.Atoi(d)
+
+	// How long are we going to keep the button pressed? (speed)
+	for speed := 0; speed < time; speed++ {
+		reach := speed * (time - speed)
+
+		if dist < reach {
+			records += 1
+		}
+	}
+
+	return fmt.Sprintf("%d", records)
 }
 
