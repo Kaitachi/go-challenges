@@ -26,8 +26,9 @@ const (
 )
 
 const (
-	SPOUT_ROW int = 0
-	SPOUT_COL int = 500
+	SPOUT_ROW	int = 0
+	SPOUT_COL	int = 500
+	GROUND		int = 2
 )
 
 
@@ -68,30 +69,45 @@ func (s *Day14) Activate(tc *lib.TestCase) {
 
 
 func (s Day14) part01() string {
-	return s.simulate()
+	max_row, min_col, max_col := s.bounds()
+	grains := s.simulate(max_row, min_col, max_col)
+	return fmt.Sprintf("%d", grains-1)
 }
 
 
 func (s Day14) part02() string {
 
-	return fmt.Sprintf("%d", -1)
+	max_row, min_col, max_col := s.bounds()
+
+	vertical_distance := max_row + 5
+
+	ground := [][]string{
+		// 200,12 -> 700,12
+		[]string{"ground_start", fmt.Sprintf("%d", SPOUT_COL - vertical_distance), fmt.Sprintf("%d", max_row + GROUND)},
+		[]string{"ground_end", fmt.Sprintf("%d", SPOUT_COL + vertical_distance), fmt.Sprintf("%d", max_row + GROUND)},
+	}
+
+	s.draw(ground)
+	s.print(max_row+5, min_col-10, max_col+10)
+	grains := s.simulate(max_row, min_col, max_col)
+	s.print(max_row+5, min_col-10, max_col+10)
+
+	return fmt.Sprintf("%d", grains)
 }
 
 
-func (s Day14) simulate() string {
-
-	max_row, min_col, max_col := s.bounds()
+func (s Day14) simulate(max_row int, min_col int, max_col int) int {
 
 	s.print(max_row, min_col, max_col)
 	grains := 0
 
 	end: for {
-		grains++
+	 	grains++
 
 		row := SPOUT_ROW
 		col := SPOUT_COL
 
-		settle: for step := 0; step < s.lowestRow() + 3; step++ {
+		settle: for step := 0; step < s.lowestRow() + GROUND; step++ {
 			//fmt.Printf("start for loop (%d, %d)...\n", row, col)
 			// Whenever layer right below us is found,
 			if line, ok := s.data[row+1]; ok {
@@ -124,7 +140,7 @@ func (s Day14) simulate() string {
 			row++
 		}
 
-		if row == s.lowestRow() + 3 {
+		if row == s.lowestRow() + GROUND || (row == SPOUT_ROW && col == SPOUT_COL) {
 			break end
 		}
 
@@ -139,7 +155,7 @@ func (s Day14) simulate() string {
 
 	s.print(max_row, min_col, max_col)
 
-	return fmt.Sprintf("%d", grains-1)
+	return grains
 }
 
 
