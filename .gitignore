@@ -1,1 +1,5 @@
 .DS_Store
+assets/AdventOfCode2022/*.in
+assets/AdventOfCode2022/*.out
+assets/AdventOfCode2023/*.in
+assets/AdventOfCode2023/*.out
