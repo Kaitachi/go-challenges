@@ -10,6 +10,7 @@ var Solutions = map[string]lib.Solver{
 	"Day04": &Day04{},
 	"Day05": &Day05{},
 	"Day06": &Day06{},
+	"Day07": &Day07{},
 	// <<NEXT_SOLUTION>>
 }
 
