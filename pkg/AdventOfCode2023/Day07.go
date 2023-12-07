@@ -16,16 +16,16 @@ type Day07 struct {
 }
 
 
-type HandType int
+type HandTypeEnum int
 
 const (
-	FIVE_OF_A_KIND	HandType = 5
-	FOUR_OF_A_KIND	HandType = 4
-	FULL_HOUSE		HandType = 3
-	THREE_OF_A_KIND	HandType = 2
-	TWO_PAIR		HandType = 1
-	ONE_PAIR		HandType = 0
-	HIGH_CARD		HandType = -1
+	FIVE_OF_A_KIND	HandTypeEnum = 5
+	FOUR_OF_A_KIND	HandTypeEnum = 4
+	FULL_HOUSE		HandTypeEnum = 3
+	THREE_OF_A_KIND	HandTypeEnum = 2
+	TWO_PAIR		HandTypeEnum = 1
+	ONE_PAIR		HandTypeEnum = 0
+	HIGH_CARD		HandTypeEnum = -1
 )
 
 var (
@@ -97,7 +97,7 @@ func (s Day07) part01() string {
 
 		switch {
 		// First, sort by Hand Type
-		case hi.HandType() != hj.HandType():
+		case HandType(hi) != HandType(hj):
 			return sortHandsByType(hi, hj)
 
 		// Then, sort by Card arrangement
@@ -120,11 +120,41 @@ func (s Day07) part01() string {
 
 func (s Day07) part02() string {
 
-	return fmt.Sprintf("%d", -1)
+	// for i := 0; i < len(s.data); i++ {
+	// 	fmt.Println(s.data[i])
+	// }
+
+	sort.SliceStable(s.data, func(i int, j int) bool {
+		hi := s.data[i]
+		hj := s.data[j]
+
+		switch {
+		// First, sort by Hand Type
+		case Part02HandType(hi) != Part02HandType(hj):
+			return sortHandsByPart02Type(hi, hj)
+
+		// Then, sort by Card arrangement
+		default:
+			return sortHandsByCardsJokerLowest(hi, hj)
+		}
+	})
+
+	// fmt.Println("----- SORTED -----")
+	// for i := 0; i < len(s.data); i++ {
+	// 	fmt.Println(s.data[i], Part02HandType(s.data[i]))
+	// }
+
+	winnings := 0
+
+	for i, hand := range s.data {
+		winnings += (i+1) * hand.bid
+	}
+
+	return fmt.Sprintf("%d", winnings)
 }
 
 
-func (h hand) HandType() HandType {
+func HandType(h hand) HandTypeEnum {
 	count := make(map[rune]int, 0)
 
 	for _, r := range h.cards {
@@ -176,8 +206,39 @@ func (h hand) HandType() HandType {
 }
 
 
+func Part02HandType(h hand) HandTypeEnum {
+	count := make(map[rune]int, 0)
+
+	for _, r := range h.cards {
+		count[r]++
+	}
+
+	// Temporarily change Jokers for whatever would be the highest-valued card
+	if _, ok := count['J']; ok {
+		var highestCount int
+		var highestCard rune
+
+		for card, n := range count {
+			if card != 'J' && highestCount < n {
+				highestCount = n
+				highestCard = card
+			}
+		}
+
+		h.cards = strings.ReplaceAll(h.cards, string('J'), string(highestCard))
+	}
+
+	return HandType(h)
+}
+
+
 func sortHandsByType(l hand, r hand) bool {
-	return l.HandType() < r.HandType()
+	return HandType(l) < HandType(r)
+}
+
+
+func sortHandsByPart02Type(l hand, r hand) bool {
+	return Part02HandType(l) < Part02HandType(r)
 }
 
 
@@ -194,5 +255,31 @@ func sortHandsByCards(l hand, r hand) bool {
 
 	// We'll assume that all hands will be distinct for now
 	return true
+}
+
+
+func sortHandsByCardsJokerLowest(l hand, r hand) bool {
+	left := []rune(l.cards)
+	right := []rune(r.cards)
+
+	for i := 0; i < 5; i++ {
+		if left[i] != right[i] {
+			rankL := part02ValueOfCard(CARD_RANKS[left[i]])
+			rankR := part02ValueOfCard(CARD_RANKS[right[i]])
+
+			return rankL < rankR
+		}
+	}
+
+	// We'll assume that all hands will be distinct for now
+	return true
+}
+
+
+func part02ValueOfCard(i int) int {
+	switch i {
+	case 11: return 1 // Joker is now the lowest-valued card
+	default: return i // Every other card can remain with their own values
+	}
 }
 
