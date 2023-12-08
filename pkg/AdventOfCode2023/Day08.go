@@ -125,6 +125,82 @@ func (s Day08) part01() string {
 
 func (s Day08) part02() string {
 
-	return fmt.Sprintf("%d", -1)
+	re_A := regexp.MustCompile(`A$`)
+	re_Z := regexp.MustCompile(`Z$`)
+
+	cursors := make([]*node, 0)
+
+	solves := make(map[string]int, 0)
+
+	// Identify all starting positions
+	for k, v := range s.tree {
+		if re_A.MatchString(k) {
+			cursors = append(cursors, v)
+		}
+	}
+
+	instructions := len(s.instructions)
+	steps := 0
+
+	for steps = 0; len(cursors) != len(solves); steps++ {
+		current := steps % instructions
+
+		switch s.instructions[current] {
+		case "L":
+			for i, cursor := range cursors {
+				cursors[i] = cursor.left
+			}
+
+		case "R":
+			for i, cursor := range cursors {
+				cursors[i] = cursor.right
+			}
+		}
+
+		for _, cursor := range cursors {
+			if _, ok := solves[cursor.name]; !ok {
+				if re_Z.MatchString(cursor.name) {
+					solves[cursor.name] = steps+1
+				}
+			}
+		}
+	}
+
+	fmt.Printf(">>> %v\n", solves)
+
+	lcm := 1
+
+	for _, v := range solves {
+		lcm = LCM(lcm, v)
+	}
+
+	steps = lcm
+
+	return fmt.Sprintf("%d", steps)
 }
+
+
+// Thanks to @siongui from GitHub for the functions below!
+// https://siongui.github.io/2017/06/03/go-find-lcm-by-gcd/ 
+// greatest common divisor (GCD) via Euclidean algorithm
+func GCD(a, b int) int {
+      for b != 0 {
+              t := b
+              b = a % b
+              a = t
+      }
+      return a
+}
+
+// find Least Common Multiple (LCM) via GCD
+func LCM(a, b int, integers ...int) int {
+      result := a * b / GCD(a, b)
+
+      for i := 0; i < len(integers); i++ {
+              result = LCM(result, integers[i])
+      }
+
+      return result
+}
+
 
