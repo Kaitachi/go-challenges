@@ -2,6 +2,7 @@ package AdventOfCode2022
 
 import (
 	"fmt"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -58,7 +59,7 @@ func (s *Day22) Assemble(tc *lib.TestCase) {
 	re_rock := regexp.MustCompile(string(WALL))
 	re_instructions := regexp.MustCompile(`(\d+)(R|L)?`)
 
-	map_line_count := strings.Count(tc.Input, "\n")-2
+	map_line_count := strings.Count(tc.Input, "\n")-1
 
 	north_pole := make(map[int]*cell, 0) // Collection of topmost items
 	south_pole := make(map[int]*cell, 0) // Collection of bottommost items
@@ -185,13 +186,16 @@ func (s *Day22) Activate(tc *lib.TestCase) {
 
 func (s Day22) part01() string {
 
-	// for i := 0; i < len(s.board); i++ {
-	// 	fmt.Printf("[%d] %+v\n", i, s.board[i])
-	// 	for k, v := range s.board[i] {
-	// 		fmt.Printf(">> [%d](%p): %#v\n", k, v, v)
-	// 	}
-	// 	fmt.Println()
-	// }
+	for i := 0; i < len(s.board); i++ {
+		fmt.Printf("[%d] %+v\n", i, s.board[i])
+		for k, v := range s.board[i] {
+			fmt.Printf(">> [%d](%p): %#v\n", k, v, v)
+		}
+		fmt.Println()
+	}
+
+	s.validateGrid()
+	// return ""
 
 	direction := "E"
 	cursor := s.spawn
@@ -200,8 +204,8 @@ func (s Day22) part01() string {
 	for _, instruction := range s.instructions {
 
 		// Where are we now?
-		fmt.Printf(">>>>>>> NOW: (%d, %d)\n", cursor.row+1, cursor.col+1)
-		fmt.Println(instruction, direction)
+		//fmt.Printf(">>>>>>> NOW: (%d, %d)\n", cursor.row+1, cursor.col+1)
+		//fmt.Println(instruction, direction)
 
 		// Walk the steps we're meant to Walk
 		for i := instruction.steps; i > 0; i-- {
@@ -228,7 +232,7 @@ func (s Day22) part01() string {
 			}
 			
 			steps = append(steps, cursor)
-			fmt.Printf(">> STEP (%d, %d)\n", cursor.row+1, cursor.col+1)
+			//fmt.Printf(">> STEP (%d, %d)\n", cursor.row+1, cursor.col+1)
 		}
 
 		// Rotate once we're done moving
@@ -251,7 +255,7 @@ func (s Day22) part01() string {
 		}
 	}
 
-	fmt.Printf("Final position: (%d, %d)\n", cursor.row+1, cursor.col+1)
+	fmt.Printf("Final position: (%d, %d), facing %s\n", cursor.row+1, cursor.col+1, direction)
 	spin := -1
 
 	switch direction {
@@ -273,5 +277,120 @@ func (s Day22) part01() string {
 func (s Day22) part02() string {
 
 	return fmt.Sprintf("%d", -1)
+}
+
+
+func (s Day22) validateGrid() {
+
+	rows := 0
+	cols := 0
+	north_poles := make(map[int]*cell, cols) // [col]*cell
+	south_poles := make(map[int]*cell, cols) // [col]*cell
+	east_poles := make(map[int]*cell, rows) // [row]*cell
+	west_poles := make(map[int]*cell, rows) // [row]*cell
+
+	for row, line := range s.board {
+		for col, cell := range line {
+			// Gather board size
+			cols = int(math.Max(float64(cols), float64(col)))
+
+			// Gather board poles
+
+			// Gather North Poles
+			if temp, ok := north_poles[col]; ok {
+				if cell.row < temp.row {
+					north_poles[col] = cell
+				}
+			} else {
+				north_poles[col] = cell
+			}
+
+			// Gather South Poles
+			if temp, ok := south_poles[col]; ok {
+				if temp.row < cell.row {
+					south_poles[col] = cell
+				}
+			} else {
+				south_poles[col] = cell
+			}
+
+			// Gather East Poles
+			if temp, ok := east_poles[row]; ok {
+				if temp.col < cell.col {
+					east_poles[row] = cell
+				}
+			} else {
+				east_poles[row] = cell
+			}
+
+			// Gather West Poles
+			if temp, ok := west_poles[row]; ok {
+				if cell.col < temp.col {
+					west_poles[row] = cell
+				}
+			} else {
+				west_poles[row] = cell
+			}
+		}
+		rows++
+	}
+
+	fmt.Printf("%v\n", s.board)
+	fmt.Println("--- EAST POLES ---")
+	fmt.Printf("%v\n", east_poles)
+	fmt.Println("--- WEST POLES ---")
+	fmt.Printf("%v\n", west_poles)
+
+	fmt.Println("Board size ", rows, cols)
+
+	// Traverse entire board
+	for row := 0; row < rows; row++ {
+		for col := 0; col < cols; col++ {
+			if cell, ok := s.board[row][col]; ok {
+				fmt.Printf("Found [%p]: %+v\n", cell, cell)
+
+				// Cell must match current index!
+				if cell.row != row || cell.col != col {
+					panic(fmt.Sprintf("Cell at %d %d is misplaced! Found %p instead.", row, col, cell))
+				}
+
+				// Let's traverse North, what will we find?
+				north := cell.N
+				expected_south_pole := south_poles[col]
+				if north != nil {
+					if (north.row != cell.row-1 && north.row != expected_south_pole.row) || north.col != cell.col {
+						panic(fmt.Sprintf("North cell is mismatching! Should be (%d, %d) or pole (%d, %d), found (%d, %d)", cell.row-1, cell.col, expected_south_pole.row, expected_south_pole.col, north.row, north.col))
+					}
+				}
+
+				// Let's traverse South, what will we find?
+				south := cell.S
+				expected_north_pole := north_poles[col]
+				if south != nil {
+					if (south.row != cell.row+1 && south.row != expected_north_pole.row) || south.col != cell.col {
+						panic(fmt.Sprintf("South cell is mismatching! Should be (%d, %d) or pole (%d, %d), found (%d, %d)", cell.row+1, cell.col, expected_north_pole.row, expected_north_pole.col, south.row, south.col))
+					}
+				}
+
+				// Let's traverse East, what will we find?
+				east := cell.E
+				expected_west_pole := west_poles[row]
+				if east != nil {
+					if east.row != cell.row || (east.col != cell.col+1 && east.col != expected_west_pole.col) {
+						panic(fmt.Sprintf("East cell is mismatching! Should be (%d, %d) or pole (%d, %d), found (%d, %d)", cell.row, cell.col+1, expected_west_pole.row, expected_west_pole.col, east.row, east.col))
+					}
+				}
+
+				// Let's traverse West, what will we find?
+				west := cell.W
+				expected_east_pole := east_poles[row]
+				if west != nil {
+					if west.row != cell.row || (west.col != cell.col-1 && west.col != expected_east_pole.col) {
+						panic(fmt.Sprintf("West cell is mismatching! Should be (%d, %d) or pole (%d, %d), found (%d, %d)", cell.row, cell.col-1, expected_east_pole.row, expected_east_pole.col, west.row, west.col))
+					}
+				}
+			}
+		}
+	}
 }
 
