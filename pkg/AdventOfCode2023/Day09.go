@@ -64,17 +64,49 @@ func (s Day09) part01() string {
 
 func (s Day09) part02() string {
 
-	return fmt.Sprintf("%d", -1)
+	sum := 0
+
+	for _, seq := range s.data {
+		sum += previousNumberByDerivative(seq)
+	}
+
+	return fmt.Sprintf("%d", sum)
 }
 
 
 func nextNumberByDerivative(seq []int) int {
+	d := calculateDerivatives(seq)
 
+	for dx := len(d)-1; dx > 0; dx-- {
+		prev, curr := d[dx-1][len(d[dx-1])-1], d[dx][len(d[dx])-1]
+
+		d[dx-1] = append(d[dx-1], curr + prev)
+	}
+
+	return d[0][len(d[0])-1]
+}
+
+
+
+func previousNumberByDerivative(seq []int) int {
+	d := calculateDerivatives(seq)
+
+	for dx := len(d)-1; dx > 0; dx-- {
+		prev, curr := d[dx-1][0], d[dx][0]
+
+		d[dx-1] = append([]int{prev - curr}, d[dx-1]...)
+	}
+
+	return d[0][0]
+}
+
+
+// Calculate nth derivative until slope = 0
+func calculateDerivatives(seq []int) [][]int {
 	d := make([][]int, 1)
 	d[0] = seq
 	m := 0
 
-	// Calculate nth derivative until slope = 0
 	for dx := 1; dx == 1 || m != 0; dx++ {
 		d = append(d, make([]int, len(d[dx-1])-1))
 		m = 0
@@ -88,17 +120,6 @@ func nextNumberByDerivative(seq []int) int {
 		}
 	}
 
-	fmt.Println("> m = 0")
-	fmt.Printf("%v\n", d)
-
-	for dx := len(d)-1; dx > 0; dx-- {
-		prev, curr := d[dx-1][len(d[dx-1])-1], d[dx][len(d[dx])-1]
-
-		d[dx-1] = append(d[dx-1], curr + prev)
-	}
-
-	fmt.Printf("> Partial = %d\n", d[0][len(d[0])-1])
-
-	return d[0][len(d[0])-1]
+	return d
 }
 
