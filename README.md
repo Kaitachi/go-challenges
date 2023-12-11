@@ -23,7 +23,7 @@ Some examples of compatible Coding Challenge websites include, but are not limit
 
 
 # How It Works
-This repository has a [thin layer](internal/lib/README.md) that has been designed to work in a simple fashion:
+This repository has a [thin layer](internal/lib/) that has been designed to work in a simple fashion:
 1. Read input files from the `assets` folder
 2. Example/scenario files are read and executed
 	* These example files consist of a single input file (with the sample input) and potentially multiple output files (with expected outputs)
