@@ -11,6 +11,7 @@ import (
 
 type Day11 struct {
 	data		[]map[int]*galaxy
+	galaxyCols	map[int][]*galaxy
 	galaxies	[]*galaxy
 	rows		int
 	cols		int
@@ -34,7 +35,7 @@ func (s *Day11) Assemble(tc *lib.TestCase) {
 	count := 0
 
 	s.galaxies = make([]*galaxy, 0)
-	galaxyCols := make(map[int][]*galaxy, 0)
+	s.galaxyCols = make(map[int][]*galaxy, 0)
 
 	for row, line := range strings.Split(tc.Input, "\n") {
 		s.data = append(s.data, make(map[int]*galaxy, 0))
@@ -54,44 +55,15 @@ func (s *Day11) Assemble(tc *lib.TestCase) {
 
 			s.data[row][col] = g
 
-			if _, ok := galaxyCols[col]; !ok {
-				galaxyCols[col] = make([]*galaxy, 0)
+			if _, ok := s.galaxyCols[col]; !ok {
+				s.galaxyCols[col] = make([]*galaxy, 0)
 			}
 
-			galaxyCols[col] = append(galaxyCols[col], g)
+			s.galaxyCols[col] = append(s.galaxyCols[col], g)
 
 			count++
 		}
 	}
-
-	// Expand galaxy
-	dRows := 0
-	dCols := 0
-
-	fmt.Printf("%+v\n", galaxyCols)
-
-	for row := 0; row < s.rows; row++ {
-		if len(s.data[row]) == 0 {
-			dRows++
-		} else {
-			for _, galaxy := range s.data[row] {
-				galaxy.row += dRows
-			}
-		}
-	}
-
-	for col := 0; col <= s.cols; col++ {
-		if _, ok := galaxyCols[col]; !ok {
-			dCols++
-		} else {
-			for _, galaxy := range galaxyCols[col] {
-				galaxy.col += dCols
-			}
-		}
-	}
-
-	s.rows += dRows
-	s.cols += dCols
 }
 
 
@@ -114,16 +86,16 @@ func (s Day11) part01() string {
 	// 	fmt.Printf("[%d]: %+v\n", row, s.data[row])
 	// }
 
-	for i := 0; i < len(s.galaxies); i++ {
-		fmt.Printf("[%d]: %+v\n", i, s.galaxies[i])
-	}
+	// for i := 0; i < len(s.galaxies); i++ {
+	// 	fmt.Printf("[%d]: %+v\n", i, s.galaxies[i])
+	// }
+
+	s.expand(1)
 
 	minDistanceSum := 0
 
 	for i := 0; i < len(s.galaxies); i++ {
 		for j := 0; j < i; j++ {
-			// fmt.Printf("Comparing [%d]: %+v with [%d]: %+v\n", i, s.galaxies[i], j, s.galaxies[j], )
-
 			minDistanceSum += s.galaxies[i].manhattan(s.galaxies[j])
 		}
 	}
@@ -134,7 +106,52 @@ func (s Day11) part01() string {
 
 func (s Day11) part02() string {
 
-	return fmt.Sprintf("%d", -1)
+	s.expand(1000000)
+
+	minDistanceSum := 0
+
+	for i := 0; i < len(s.galaxies); i++ {
+		for j := 0; j < i; j++ {
+			manh := s.galaxies[i].manhattan(s.galaxies[j])
+
+			// fmt.Printf("Comparing [%d]: %+v with [%d]: %+v => manh: %d\n", i, s.galaxies[i], j, s.galaxies[j], manh)
+			minDistanceSum += manh
+		}
+	}
+
+	return fmt.Sprintf("%d", minDistanceSum)
+}
+
+
+func (s *Day11) expand(age int) {
+	// Expand galaxy
+	dRows := 0
+	dCols := 0
+
+	//fmt.Printf("%+v\n", s.galaxyCols)
+
+	for row := 0; row < s.rows; row++ {
+		if len(s.data[row]) == 0 {
+			dRows += age-1
+		} else {
+			for _, galaxy := range s.data[row] {
+				galaxy.row += dRows
+			}
+		}
+	}
+
+	for col := 0; col <= s.cols; col++ {
+		if _, ok := s.galaxyCols[col]; !ok {
+			dCols += age-1
+		} else {
+			for _, galaxy := range s.galaxyCols[col] {
+				galaxy.col += dCols
+			}
+		}
+	}
+
+	s.rows += dRows
+	s.cols += dCols
 }
 
 
