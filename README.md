@@ -16,8 +16,8 @@ Some examples of compatible Coding Challenge websites include, but are not limit
 <details>
 	<summary>List of Projects</summary>
 	<ul>
-		<li><a href="pkg/AdventOfCode2022/README.md">Advent of Code 2022</a></li>
-		<li><a href="pkg/AdventOfCode2023/README.md">Advent of Code 2023</a></li>
+		<li><a href="pkg/AdventOfCode2022/">Advent of Code 2022</a></li>
+		<li><a href="pkg/AdventOfCode2023/">Advent of Code 2023</a></li>
 	</ul>
 </details>
 
