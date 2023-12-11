@@ -1,8 +1,7 @@
-![Advent of Code 2023 Stars](https://img.shields.io/badge/Stars-20%2F50-silver)
-[Advent of Code 2023](https://adventofcode.com/2023)
+![Advent of Code 2023 Stars](https://img.shields.io/badge/Stars-20%2F50-gold)
 
 # Advent of Code 2023
-Advent of Code is a yearly Challenge hosted yearly by Eric Wastl over the first 25 days of December. You can read more about it here: [About Advent of Code](https://adventofcode.com/2023/about)
+[Advent of Code](https://adventofcode.com/2023) is a yearly Challenge hosted yearly by Eric Wastl over the first 25 days of December. You can read more about it here: [About Advent of Code](https://adventofcode.com/2023/about)
 
 
 ## NOTE
