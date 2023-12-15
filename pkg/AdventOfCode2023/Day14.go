@@ -19,6 +19,15 @@ const (
 )
 
 
+var (
+	// {dy, dx}
+	NORTH = [2]int{-1, 0}
+	EAST = [2]int{0, 1}
+	SOUTH = [2]int{1, 0}
+	WEST = [2]int{0, -1}
+)
+
+
 // 1. Assemble - How should we transform the data from our input files?
 func (s *Day14) Assemble(tc *lib.TestCase) {
 
@@ -48,17 +57,11 @@ func (s *Day14) Activate(tc *lib.TestCase) {
 
 func (s Day14) part01() string {
 
-	for row, line := range s.data {
-		fmt.Printf("[%d]: %+v\n", row, line)
-	}
-
-	s.data = tiltNorth(s.data)
+	tilt(&s.data, NORTH)
 
 	totalLoad := 0
 
 	for row, line := range s.data {
-		fmt.Printf("[%d]: %+v\n", row, line)
-
 		for _, cell := range line {
 			if cell == SLIDE {
 				totalLoad += len(s.data)-row
@@ -72,38 +75,88 @@ func (s Day14) part01() string {
 
 func (s Day14) part02() string {
 
-	return fmt.Sprintf("%d", -1)
-}
+	cycles := 1000000000
+	directions := [][2]int{
+		NORTH,
+		WEST,
+		SOUTH,
+		EAST,
+	}
+	print(&s.data)
 
+	for steps := 0; steps < cycles * len(directions); steps++ {
+		tilt(&s.data, directions[steps%len(directions)])
+		// print(&s.data)
+	}
 
-func tiltNorth(grid [][]string) [][]string {
-	for row, line := range grid {
-		for col, cell := range line {
-			if row <= 0 {
-				continue
+	totalLoad := 0
+
+	for row, line := range s.data {
+		for _, cell := range line {
+			if cell == SLIDE {
+				totalLoad += len(s.data)-row
 			}
-
-			if cell != SLIDE {
-				continue
-			}
-
-			for i := 1; i <= row; i++ {
-				fmt.Printf(">> (%d, %d) checking i=%d\n", row, col, i)
-				if grid[row-i][col] != SPACE {
-					// Destination is already occupied; let's stop here
-					break
-				}
-
-				// Swap these two positions
-				temp := grid[row-i+1][col]
-				grid[row-i+1][col] = grid[row-i][col]
-				grid[row-i][col] = temp
-			}
-
-			fmt.Printf("> %d, %d\n", row, col)
 		}
 	}
 
-	return grid
+	return fmt.Sprintf("%d", totalLoad)
+}
+
+
+func tilt(grid *[][]string, kernel [2]int) {
+	// Find direction using direction kernel
+	dy, dx := kernel[0], kernel[1]
+
+	// fmt.Printf("> dy: %d, dx: %d\n", dy, dx)
+	r0, c0 := 0, 0
+	rn, cn := len(*grid), len((*grid)[0])
+	delta := 1
+
+	// We should reverse iteration order when tilting to the South or East
+	if dy > 0 || dx > 0 {
+		r0, c0 = rn, cn
+		rn, cn = 0, 0
+		delta = -1
+	}
+
+	for row := r0; row != rn + delta; row += delta {
+		for col := c0; col != cn + delta; col += delta {
+			if row < 0 || len(*grid) <= row { continue }
+			if col < 0 || len((*grid)[0]) <= col { continue }
+			if (*grid)[row][col] != SLIDE { continue }
+
+			source_x, source_y := col, row
+			target_x, target_y := col, row
+
+			// Once we know in which direction to move, let's move forward until no more moves are left
+			for {
+				target_x += dx
+				target_y += dy
+
+				if target_y < 0 || len(*grid) <= target_y { break }
+				if target_x < 0 || len((*grid)[0]) <= target_x { break }
+				if (*grid)[target_y][target_x] != SPACE { break }
+
+				// fmt.Printf("> Swapping (%d, %d) with (%d, %d)\n", source_y, source_x, target_y, target_x)
+				
+				// Swap source/target items
+				temp := (*grid)[target_y][target_x]
+				(*grid)[target_y][target_x] = (*grid)[source_y][source_x]
+				(*grid)[source_y][source_x] = temp
+
+				// Move source pointer
+				source_x += dx
+				source_y += dy
+			}
+		}
+	}
+}
+
+
+func print(grid *[][]string) {
+	fmt.Printf("-----\n")
+	for row, line := range *grid {
+		fmt.Printf("[%d]: %+v\n", row, line)
+	}
 }
 
