@@ -122,7 +122,30 @@ func (s Day19) part01() string {
 
 func (s Day19) part02() string {
 
-	return fmt.Sprintf("%d", -1)
+	accepted := 0
+
+	for _x := 1; _x <= 4000; _x++ {
+		for _m := 1; _m <= 4000; _m++ {
+			for _a := 1; _a <= 4000; _a++ {
+				for _s := 1; _s <= 4000; _s++ {
+					xmas := xmasPart{
+						x: _x,
+						m: _m,
+						a: _a,
+						s: _s,
+					}
+
+					accept, _ := s.sort(xmas)
+
+					if accept > 0 {
+						accepted++
+					}
+				}
+			}
+		}
+	}
+
+	return fmt.Sprintf("%d", accepted)
 }
 
 
