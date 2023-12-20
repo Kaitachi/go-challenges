@@ -2,6 +2,8 @@ package AdventOfCode2023
 
 import (
 	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/kaitachi/go-challenges/internal/lib"
@@ -52,7 +54,41 @@ func (s Day15) part01() string {
 
 func (s Day15) part02() string {
 
-	return fmt.Sprintf("%d", -1)
+	mult := 17
+	mod := 256
+	power := 0
+
+	boxes := make(map[int][][]string, 0)
+
+	re_parts := regexp.MustCompile(`(\w+)[=|\-](\d+)?`)
+
+	for _, line := range s.data {
+
+		instruction := re_parts.FindStringSubmatch(line)
+
+		label := instruction[1]
+		hash := hash(label, mult, mod)
+
+		fmt.Printf("> line %s [%d]: %v\n", line, hash, instruction)
+
+
+		if instruction[2] == "" {
+			s.remove(&boxes, hash, label)
+		} else {
+			s.append(&boxes, hash, instruction[1:])
+		}
+	}
+
+	for box, lenses := range boxes {
+		// fmt.Printf("[%d]: %+v\n", box, lenses)
+		for slot, lens := range lenses {
+			if len(lens) == 0 { continue }
+			focalLength, _ := strconv.Atoi(lens[1])
+			power += (box+1) * (slot+1) * (focalLength)
+		}
+	}
+
+	return fmt.Sprintf("%d", power)
 }
 
 
@@ -66,5 +102,41 @@ func hash(s string, mult int, mod int) int {
 	}
 
 	return hash
+}
+
+
+func (s Day15) remove(boxes *map[int][][]string, hash int, label string) {
+	lenses := (*boxes)[hash]
+	index, ok := s.lensIndex(&lenses, label)
+
+	if ok {
+		(*boxes)[hash] = append(lenses[:index], lenses[index+1:]...)
+	}
+}
+
+
+func (s Day15) append(boxes *map[int][][]string, hash int, lens []string) {
+	lenses := (*boxes)[hash]
+	index, ok := s.lensIndex(&lenses, lens[0])
+
+	if ok {
+		(*boxes)[hash][index] = lens
+	} else {
+		(*boxes)[hash] = append((*boxes)[hash], lens)
+	}
+}
+
+
+func (s Day15) lensIndex(box *[][]string, label string) (int, bool) {
+	index := 0
+	ok := false
+
+	for i := 0; i < len(*box); i++ {
+		if (*box)[i][0] == label {
+			index, ok = i, true
+		}
+	}
+
+	return index, ok
 }
 
